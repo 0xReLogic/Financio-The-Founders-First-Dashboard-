@@ -14,6 +14,7 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { toast } = useToast();
   const { setUser } = useAuthStore();
   const [formData, setFormData] = useState({
@@ -46,16 +47,13 @@ export default function Register() {
         `${formData.name} (${formData.businessName})`
       );
       
-      // Get user and update store
-      const user = await authService.getCurrentUser();
-      setUser(user);
-      
       toast({
         title: "Account Created! 🎉",
-        description: "Welcome to Financio! Redirecting to dashboard...",
+        description: "Check your email to verify your account, then login.",
       });
       
-      setTimeout(() => setLocation('/dashboard'), 1000);
+      setRegistrationSuccess(true);
+      setTimeout(() => setLocation('/login'), 3000);
     } catch (error: any) {
       toast({
         title: "Registration Failed",
@@ -86,6 +84,24 @@ export default function Register() {
           </div>
         </CardHeader>
         <CardContent>
+          {registrationSuccess ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-md text-center">
+                <p className="font-semibold text-lg mb-2">✅ Account Created!</p>
+                <p className="text-sm">
+                  We've sent a verification email to <strong>{formData.email}</strong>
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Please check your inbox and verify your email before logging in.
+                </p>
+              </div>
+              <Link href="/login">
+                <Button variant="outline" className="w-full">
+                  Go to Login
+                </Button>
+              </Link>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nama Lengkap</Label>
@@ -192,7 +208,9 @@ export default function Register() {
               )}
             </Button>
           </form>
+          )}
 
+          {!registrationSuccess && (
           <p className="text-center text-sm text-muted-foreground mt-6">
             Sudah punya akun?{' '}
             <Link href="/login">
@@ -201,6 +219,7 @@ export default function Register() {
               </a>
             </Link>
           </p>
+          )}
         </CardContent>
       </Card>
     </div>

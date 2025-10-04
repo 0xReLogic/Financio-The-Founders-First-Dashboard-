@@ -6,14 +6,22 @@ export interface User extends Models.User<Models.Preferences> {}
 class AuthService {
   /**
    * Register new user with email & password
+   * Sends verification email instead of auto-login
    */
   async register(email: string, password: string, name: string): Promise<User> {
     try {
       const user = await account.create(ID.unique(), email, password, name);
       console.log('✅ User registered:', user);
       
-      // Auto login after registration
-      await this.login(email, password);
+      // Send verification email
+      try {
+        const verificationUrl = `${window.location.origin}/verify-email`;
+        await account.createVerification(verificationUrl);
+        console.log('✅ Verification email sent to:', email);
+      } catch (verifyError) {
+        console.warn('⚠️ Could not send verification email:', verifyError);
+        // Don't fail registration if email fails
+      }
       
       return user;
     } catch (error: any) {
@@ -135,6 +143,19 @@ class AuthService {
     } catch (error: any) {
       console.error('❌ Password update failed:', error);
       throw new Error(error.message || 'Password update failed');
+    }
+  }
+
+  /**
+   * Complete email verification with secret from email
+   */
+  async verifyEmail(userId: string, secret: string): Promise<void> {
+    try {
+      await account.updateVerification(userId, secret);
+      console.log('✅ Email verified successfully');
+    } catch (error: any) {
+      console.error('❌ Email verification failed:', error);
+      throw new Error(error.message || 'Email verification failed');
     }
   }
 
