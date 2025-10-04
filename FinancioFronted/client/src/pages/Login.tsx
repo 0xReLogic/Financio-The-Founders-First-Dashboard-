@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Leaf, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/authService';
+import { useAuthStore } from '@/lib/authStore';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,13 +16,32 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated, setUser, logout: storeLogout } = useAuthStore();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation('/dashboard');
+    }
+  }, [isAuthenticated, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // First, try to logout any existing session
+      try {
+        await storeLogout();
+      } catch (logoutError) {
+        // Ignore logout errors
+        console.log('No existing session to logout');
+      }
+
+      // Then login
       await authService.login(email, password);
+      const user = await authService.getCurrentUser();
+      setUser(user);
       
       toast({
         title: "Login Successful! 🎉",

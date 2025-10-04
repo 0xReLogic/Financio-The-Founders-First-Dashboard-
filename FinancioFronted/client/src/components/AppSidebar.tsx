@@ -1,5 +1,7 @@
-import { LayoutDashboard, Receipt, FolderOpen, Sparkles, Settings, Leaf } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, Sparkles, Settings, Leaf, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
+import { useAuthStore } from '@/lib/authStore';
+import { useToast } from '@/hooks/use-toast';
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 
 const menuItems = [
@@ -41,7 +44,22 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { logout, user } = useAuthStore();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged Out",
+        description: "See you next time! 👋",
+      });
+      setLocation('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <Sidebar data-testid="sidebar-main">
@@ -76,6 +94,22 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-4 border-t">
+        <div className="space-y-2">
+          <div className="px-2 py-1 text-sm">
+            <p className="font-medium truncate">{user?.name || 'User'}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+          </div>
+          <SidebarMenuButton 
+            onClick={handleLogout}
+            className="w-full"
+            data-testid="button-logout"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </SidebarMenuButton>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

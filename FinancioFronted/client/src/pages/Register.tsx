@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/authService';
+import { useAuthStore } from '@/lib/authStore';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ export default function Register() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { setUser } = useAuthStore();
   const [formData, setFormData] = useState({
     name: '',
     businessName: '',
@@ -43,6 +45,10 @@ export default function Register() {
         formData.password,
         `${formData.name} (${formData.businessName})`
       );
+      
+      // Get user and update store
+      const user = await authService.getCurrentUser();
+      setUser(user);
       
       toast({
         title: "Account Created! 🎉",
