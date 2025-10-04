@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -28,39 +29,41 @@ function AuthenticatedLayout() {
   };
 
   return (
-    <SidebarProvider style={style as React.CSSProperties}>
-      <div className="flex h-screen w-full">
-        <AppSidebar />
-        <div className="flex flex-col flex-1">
-          <header className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" data-testid="button-notifications">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon" data-testid="button-profile">
-                <User className="w-5 h-5" />
-              </Button>
-              <ThemeToggle />
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto p-6">
-            <div className="max-w-7xl mx-auto">
-              <Switch>
-                <Route path="/dashboard" component={Dashboard} />
-                <Route path="/transactions" component={Transactions} />
-                <Route path="/categories" component={Categories} />
-                <Route path="/advisor" component={AIAdvisor} />
-                <Route path="/settings" component={Settings} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
-          </main>
+    <ProtectedRoute>
+      <SidebarProvider style={style as React.CSSProperties}>
+        <div className="flex h-screen w-full">
+          <AppSidebar />
+          <div className="flex flex-col flex-1">
+            <header className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger data-testid="button-sidebar-toggle" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" data-testid="button-notifications">
+                  <Bell className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon" data-testid="button-profile">
+                  <User className="w-5 h-5" />
+                </Button>
+                <ThemeToggle />
+              </div>
+            </header>
+            <main className="flex-1 overflow-auto p-6">
+              <div className="max-w-7xl mx-auto">
+                <Switch>
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/transactions" component={Transactions} />
+                  <Route path="/categories" component={Categories} />
+                  <Route path="/advisor" component={AIAdvisor} />
+                  <Route path="/settings" component={Settings} />
+                  <Route component={NotFound} />
+                </Switch>
+              </div>
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
