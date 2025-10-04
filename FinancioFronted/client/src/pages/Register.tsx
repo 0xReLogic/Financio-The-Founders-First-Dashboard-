@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import { Leaf, Eye, EyeOff } from 'lucide-react';
+import { Leaf, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/lib/authService';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [, setLocation] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     businessName: '',
@@ -18,11 +22,43 @@ export default function Register() {
     confirmPassword: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register:', formData);
-    // todo: remove mock functionality - redirect to dashboard for demo
-    setLocation('/dashboard');
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Password and confirmation do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await authService.register(
+        formData.email,
+        formData.password,
+        `${formData.name} (${formData.businessName})`
+      );
+      
+      toast({
+        title: "Account Created! 🎉",
+        description: "Welcome to Financio! Redirecting to dashboard...",
+      });
+      
+      setTimeout(() => setLocation('/dashboard'), 1000);
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "Could not create account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -139,8 +175,15 @@ export default function Register() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" data-testid="button-register">
-              Daftar Sekarang
+            <Button type="submit" className="w-full" data-testid="button-register" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                'Daftar Sekarang'
+              )}
             </Button>
           </form>
 

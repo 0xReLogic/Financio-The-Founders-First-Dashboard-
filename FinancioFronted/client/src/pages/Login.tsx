@@ -1,22 +1,43 @@
 import { useState } from 'react';
-import { Leaf, Eye, EyeOff } from 'lucide-react';
+import { Leaf, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/lib/authService';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login:', { email, password });
-    // todo: remove mock functionality - redirect to dashboard for demo
-    setLocation('/dashboard');
+    setIsLoading(true);
+
+    try {
+      await authService.login(email, password);
+      
+      toast({
+        title: "Login Successful! 🎉",
+        description: "Welcome back to Financio!",
+      });
+      
+      setLocation('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,8 +105,15 @@ export default function Login() {
                 </a>
               </Link>
             </div>
-            <Button type="submit" className="w-full" data-testid="button-signin">
-              Sign In
+            <Button type="submit" className="w-full" data-testid="button-signin" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-6">

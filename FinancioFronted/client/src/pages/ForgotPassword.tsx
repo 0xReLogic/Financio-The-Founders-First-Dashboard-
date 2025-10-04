@@ -1,20 +1,41 @@
 import { useState } from 'react';
-import { Leaf, ArrowLeft } from 'lucide-react';
+import { Leaf, ArrowLeft, Loader2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/lib/authService';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Forgot password for:', email);
-    // todo: remove mock functionality
-    setSubmitted(true);
+    setIsLoading(true);
+
+    try {
+      await authService.resetPassword(email);
+      
+      toast({
+        title: "Recovery Email Sent! 📧",
+        description: `Check your inbox at ${email}`,
+      });
+      
+      setSubmitted(true);
+    } catch (error: any) {
+      toast({
+        title: "Failed to Send Email",
+        description: error.message || "Could not send recovery email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,8 +73,15 @@ export default function ForgotPassword() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" data-testid="button-reset">
-                Kirim Link Reset
+              <Button type="submit" className="w-full" data-testid="button-reset" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  'Kirim Link Reset'
+                )}
               </Button>
             </form>
           ) : (
