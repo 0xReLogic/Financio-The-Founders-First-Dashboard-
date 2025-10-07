@@ -48,7 +48,7 @@ export default function CategoryDialog({
   open,
   onOpenChange,
   category,
-}: CategoryDialogProps) {
+}: Readonly<CategoryDialogProps>) {
   const { toast } = useToast();
   const [name, setName] = useState(category?.name || '');
   const [type, setType] = useState<'income' | 'expense'>(

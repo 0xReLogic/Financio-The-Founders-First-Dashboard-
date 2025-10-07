@@ -35,7 +35,7 @@ const steps = [
 export default function ProgressiveLoading({
   onComplete,
   duration = 3000,
-}: ProgressiveLoadingProps) {
+}: Readonly<ProgressiveLoadingProps>) {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 

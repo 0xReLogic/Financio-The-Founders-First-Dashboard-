@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/authService';
-import { useAuthStore } from '@/lib/authStore';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);

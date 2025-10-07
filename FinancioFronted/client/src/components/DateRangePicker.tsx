@@ -38,7 +38,7 @@ export default function DateRangePicker({
   value,
   onChange,
   className,
-}: DateRangePickerProps) {
+}: Readonly<DateRangePickerProps>) {
   const [selectedPreset, setSelectedPreset] = useState('30');
 
   const getDateRange = (preset: string): DateRange => {

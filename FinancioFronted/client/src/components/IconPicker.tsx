@@ -50,7 +50,7 @@ interface IconPickerProps {
   color?: string;
 }
 
-export default function IconPicker({ value, onChange, color = '#65a30d' }: IconPickerProps) {
+export default function IconPicker({ value, onChange, color = '#65a30d' }: Readonly<IconPickerProps>) {
   const [open, setOpen] = useState(false);
 
   const selectedIcon = availableIcons.find((i) => i.name === value) || availableIcons[0];
