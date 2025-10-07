@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -18,17 +19,12 @@ import {
 } from '@/components/ui/select';
 import IconPicker from '@/components/IconPicker';
 import { useToast } from '@/hooks/use-toast';
+import { categoryService, type Category } from '@/lib/databaseService';
 
 interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category?: {
-    id: string;
-    name: string;
-    type: 'income' | 'expense';
-    color: string;
-    icon?: string;
-  };
+  category?: Category | null;
 }
 
 const PRESET_COLORS = [
@@ -50,6 +46,7 @@ export default function CategoryDialog({
   category,
 }: Readonly<CategoryDialogProps>) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [name, setName] = useState(category?.name || '');
   const [type, setType] = useState<'income' | 'expense'>(
     category?.type || 'expense'
@@ -61,6 +58,64 @@ export default function CategoryDialog({
     category?.icon || 'ShoppingCart'
   );
 
+  // Update form when category changes
+  useEffect(() => {
+    if (category) {
+      setName(category.name);
+      setType(category.type);
+      setSelectedColor(category.color);
+      setSelectedIcon(category.icon);
+    } else {
+      setName('');
+      setType('expense');
+      setSelectedColor('#65a30d');
+      setSelectedIcon('ShoppingCart');
+    }
+  }, [category]);
+
+  // Create mutation
+  const createMutation = useMutation({
+    mutationFn: categoryService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast({
+        title: 'Kategori ditambahkan',
+        description: `${name} berhasil ditambahkan`,
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      console.error('Create category error:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal menambahkan kategori. Silakan coba lagi.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      categoryService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast({
+        title: 'Kategori diperbarui',
+        description: `${name} berhasil diperbarui`,
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      console.error('Update category error:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memperbarui kategori. Silakan coba lagi.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleSubmit = () => {
     if (!name.trim()) {
       toast({
@@ -71,16 +126,23 @@ export default function CategoryDialog({
       return;
     }
 
-    // Mock save
-    toast({
-      title: category ? 'Kategori diperbarui' : 'Kategori ditambahkan',
-      description: `${name} berhasil ${category ? 'diperbarui' : 'ditambahkan'}`,
-    });
+    const categoryData = {
+      name: name.trim(),
+      type,
+      color: selectedColor,
+      icon: selectedIcon,
+    };
 
-    onOpenChange(false);
-    setName('');
-    setType('expense');
-    setSelectedColor('#65a30d');
+    if (category?.$id) {
+      // Update existing category
+      updateMutation.mutate({
+        id: category.$id,
+        data: categoryData,
+      });
+    } else {
+      // Create new category
+      createMutation.mutate(categoryData);
+    }
   };
 
   return (

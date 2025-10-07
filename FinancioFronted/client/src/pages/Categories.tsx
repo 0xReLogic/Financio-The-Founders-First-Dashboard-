@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, FolderOpen } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,18 +17,52 @@ import {
 import CategoryDialog from '@/components/CategoryDialog';
 import EmptyState from '@/components/EmptyState';
 import { useToast } from '@/hooks/use-toast';
-import { mockCategories, mockTransactions, formatCurrency } from '@/lib/mockData';
+import { categoryService, transactionService, type Category } from '@/lib/databaseService';
+import { formatCurrency } from '@/lib/mockData';
 
 export default function Categories() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+
+  // Fetch categories from database
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.list(),
+  });
+
+  // Fetch transactions to calculate statistics
+  const { data: transactions = [] } = useQuery({
+    queryKey: ['transactions'],
+    queryFn: () => transactionService.list(),
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (categoryId: string) => categoryService.delete(categoryId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast({
+        title: 'Category deleted',
+        description: 'The category has been removed successfully.',
+      });
+    },
+    onError: (error) => {
+      console.error('Delete category error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete category. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Calculate statistics for each category
   const getCategoryStats = (categoryName: string) => {
-    const categoryTransactions = mockTransactions.filter(
+    const categoryTransactions = transactions.filter(
       (t) => t.category === categoryName
     );
     const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -42,22 +77,19 @@ export default function Categories() {
     setCategoryDialogOpen(true);
   };
 
-  const handleEditCategory = (category: any) => {
+  const handleEditCategory = (category: Category) => {
     setSelectedCategory(category);
     setCategoryDialogOpen(true);
   };
 
-  const handleDeleteClick = (category: any) => {
+  const handleDeleteClick = (category: Category) => {
     setCategoryToDelete(category);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = () => {
-    if (categoryToDelete) {
-      toast({
-        title: 'Kategori dihapus',
-        description: `${categoryToDelete.name} berhasil dihapus`,
-      });
+    if (categoryToDelete?.$id) {
+      deleteMutation.mutate(categoryToDelete.$id);
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
     }
@@ -81,7 +113,11 @@ export default function Categories() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mockCategories.length === 0 ? (
+        {categoriesLoading ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-muted-foreground">Loading categories...</p>
+          </div>
+        ) : categories.length === 0 ? (
           <div className="col-span-full">
             <EmptyState
               icon={FolderOpen}
@@ -92,13 +128,13 @@ export default function Categories() {
             />
           </div>
         ) : (
-          mockCategories.map((category) => {
+          categories.map((category) => {
             const stats = getCategoryStats(category.name);
             return (
               <Card
-                key={category.id}
+                key={category.$id}
                 className="hover-elevate"
-                data-testid={`card-category-${category.id}`}
+                data-testid={`card-category-${category.$id}`}
               >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -116,7 +152,7 @@ export default function Categories() {
                         size="icon"
                         variant="ghost"
                         onClick={() => handleEditCategory(category)}
-                        data-testid={`button-edit-category-${category.id}`}
+                        data-testid={`button-edit-category-${category.$id}`}
                       >
                         <Pencil className="w-4 h-4" />
                       </Button>
@@ -124,7 +160,7 @@ export default function Categories() {
                         size="icon"
                         variant="ghost"
                         onClick={() => handleDeleteClick(category)}
-                        data-testid={`button-delete-category-${category.id}`}
+                        data-testid={`button-delete-category-${category.$id}`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
