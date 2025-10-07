@@ -16,7 +16,6 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { toast } = useToast();
-  const { setUser } = useAuthStore();
   const [formData, setFormData] = useState({
     name: '',
     businessName: '',

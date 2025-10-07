@@ -4,10 +4,10 @@ import { useAuthStore } from '@/lib/authStore';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children }: Readonly<ProtectedRouteProps>) {
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
 

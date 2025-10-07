@@ -52,8 +52,8 @@ class AuthService {
       const user = await account.get();
       console.log('✅ Current user:', user);
       return user;
-    } catch (error) {
-      console.log('ℹ️ No user logged in');
+    } catch (error: any) {
+      console.log('ℹ️ No user logged in:', error.message || 'Not authenticated');
       return null;
     }
   }

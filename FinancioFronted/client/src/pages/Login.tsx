@@ -34,8 +34,8 @@ export default function Login() {
       try {
         await storeLogout();
       } catch (logoutError) {
-        // Ignore logout errors
-        console.log('No existing session to logout');
+        // Ignore logout errors - user might not have an active session
+        console.log('No existing session to logout:', logoutError);
       }
 
       // Then login

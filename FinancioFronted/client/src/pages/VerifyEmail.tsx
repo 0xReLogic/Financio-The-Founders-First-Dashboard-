@@ -53,31 +53,42 @@ export default function VerifyEmail() {
     verifyEmail();
   }, [toast, setLocation]);
 
+  // Determine icon based on state
+  const getIcon = () => {
+    if (isVerifying) return <Loader2 className="w-10 h-10 text-primary-foreground animate-spin" />;
+    if (success) return <CheckCircle className="w-10 h-10 text-primary-foreground" />;
+    return <Leaf className="w-10 h-10 text-primary-foreground" />;
+  };
+
+  // Determine title based on state
+  const getTitle = () => {
+    if (isVerifying) return 'Verifying Email...';
+    if (success) return 'Email Verified!';
+    return 'Verification Failed';
+  };
+
+  // Determine description based on state
+  const getDescription = () => {
+    if (isVerifying) return 'Please wait while we verify your email';
+    if (success) return 'Redirecting to login...';
+    return 'Could not verify your email';
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f7fee7] to-[#fefce8] p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4 pb-8">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-md bg-primary flex items-center justify-center">
-              {isVerifying ? (
-                <Loader2 className="w-10 h-10 text-primary-foreground animate-spin" />
-              ) : success ? (
-                <CheckCircle className="w-10 h-10 text-primary-foreground" />
-              ) : (
-                <Leaf className="w-10 h-10 text-primary-foreground" />
-              )}
+              {getIcon()}
             </div>
           </div>
           <div>
             <h1 className="text-3xl font-bold">
-              {isVerifying ? 'Verifying Email...' : success ? 'Email Verified!' : 'Verification Failed'}
+              {getTitle()}
             </h1>
             <p className="text-muted-foreground mt-2">
-              {isVerifying 
-                ? 'Please wait while we verify your email' 
-                : success 
-                ? 'Redirecting to login...' 
-                : 'Could not verify your email'}
+              {getDescription()}
             </p>
           </div>
         </CardHeader>

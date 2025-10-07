@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useState } from 'react';
+
 import { useToast } from '@/hooks/use-toast';
 
 export default function Settings() {

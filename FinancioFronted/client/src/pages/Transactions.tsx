@@ -20,7 +20,8 @@ export default function Transactions() {
   const [filterType, setFilterType] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // Dialog state for adding transactions (dialog component to be implemented)
+  const [, setIsAddDialogOpen] = useState(false);
 
   const filteredTransactions = mockTransactions.filter((transaction) => {
     const matchesSearch = transaction.description
