@@ -40,8 +40,8 @@ def check_rate_limit(databases, user_id):
             }
         
         # Get credit info
-        total_credits = rate_limit.get("totalCredits", FREE_TIER_CREDITS)
-        used_credits = rate_limit.get("usedCredits", 0)
+        total_credits = rate_limit.get("totalCredits") if "totalCredits" in rate_limit else FREE_TIER_CREDITS
+        used_credits = rate_limit.get("usedCredits") if "usedCredits" in rate_limit else 0
         remaining_credits = total_credits - used_credits
         
         # Check if user has credits
@@ -141,11 +141,10 @@ def analyze_transactions(transactions, categories):
     }
 
 def generate_ai_advice(analysis_data, transactions):
-    """Generate financial advice using Gemini AI"""
+    """Generate AI financial advice using Gemini"""
     try:
-        # Configure Gemini
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
         # Build prompt
         prompt = f"""
@@ -185,6 +184,8 @@ Format response dalam markdown dengan struktur yang jelas dan mudah dibaca.
 def save_analysis(databases, user_id, analysis_summary, ai_advice):
     """Save analysis result to database"""
     try:
+        # Collection has create("any") permission, documentSecurity: true
+        # So we DON'T set document-level permissions - let collection handle it
         analysis = databases.create_document(
             database_id=DATABASE_ID,
             collection_id=AI_ANALYSES_COLLECTION,
@@ -195,12 +196,8 @@ def save_analysis(databases, user_id, analysis_summary, ai_advice):
                 "summary": json.dumps(analysis_summary),
                 "advice": ai_advice,
                 "periodDays": 30
-            },
-            permissions=[
-                Permission.read(Role.user(user_id)),
-                Permission.update(Role.user(user_id)),
-                Permission.delete(Role.user(user_id))
-            ]
+            }
+            # No permissions parameter - rely on collection-level permissions
         )
         
         return analysis
@@ -227,10 +224,17 @@ def main(context):
         
         context.log(f"Processing AI analysis for user: {user_id}")
         
+        # Debug: Check rate limit document first
+        try:
+            debug_doc = databases.get_document(DATABASE_ID, RATE_LIMITS_COLLECTION, user_id)
+            context.log(f"Rate limit document: {json.dumps(debug_doc)}")
+        except Exception as e:
+            context.log(f"Failed to get rate limit for debug: {str(e)}")
+        
         # Check credits
         allowed, credit_info = check_rate_limit(databases, user_id)
         if not allowed:
-            context.log(f"No credits remaining for user {user_id}")
+            context.log(f"Credit check failed: {json.dumps(credit_info)}")
             return context.res.json({
                 **credit_info,
                 "code": "NO_CREDITS"

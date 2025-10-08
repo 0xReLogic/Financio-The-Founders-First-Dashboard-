@@ -152,19 +152,41 @@ export async function hasCategories(): Promise<boolean> {
 
 /**
  * Seed categories if user doesn't have any
+ * Uses a timestamp lock to prevent concurrent seeding
  */
 export async function seedIfEmpty() {
   try {
+    // Check lock to prevent concurrent seeding
+    const lockKey = 'seeding_categories_lock';
+    const existingLock = localStorage.getItem(lockKey);
+    const now = Date.now();
+    
+    // If locked less than 30 seconds ago, skip
+    if (existingLock && now - parseInt(existingLock) < 30000) {
+      console.log('Seeding already in progress, skipping...');
+      return null;
+    }
+    
+    // Set lock
+    localStorage.setItem(lockKey, now.toString());
+    
     const hasCats = await hasCategories();
     if (!hasCats) {
       console.log('No categories found, seeding defaults...');
-      return await seedDefaultCategories();
+      const result = await seedDefaultCategories();
+      // Clear lock on success
+      localStorage.removeItem(lockKey);
+      return result;
     } else {
       console.log('Categories already exist, skipping seed.');
+      // Clear lock
+      localStorage.removeItem(lockKey);
       return null;
     }
   } catch (error) {
     console.error('Error in seedIfEmpty:', error);
+    // Clear lock on error
+    localStorage.removeItem('seeding_categories_lock');
     throw error;
   }
 }

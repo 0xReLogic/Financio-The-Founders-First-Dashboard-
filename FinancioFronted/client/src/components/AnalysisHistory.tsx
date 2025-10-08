@@ -1,41 +1,54 @@
-import { Calendar, TrendingUp, TrendingDown } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-
-interface AnalysisHistoryItem {
-  id: string;
-  date: string;
-  healthScore: number;
-  trend: 'up' | 'down' | 'stable';
-  summary: string;
-}
-
-const mockHistory: AnalysisHistoryItem[] = [
-  {
-    id: '1',
-    date: '2025-10-01',
-    healthScore: 72,
-    trend: 'up',
-    summary: 'Peningkatan cash flow 15%, pengurangan pengeluaran tidak perlu',
-  },
-  {
-    id: '2',
-    date: '2025-09-24',
-    healthScore: 68,
-    trend: 'up',
-    summary: 'Stabilitas keuangan meningkat, profit margin bertumbuh',
-  },
-  {
-    id: '3',
-    date: '2025-09-17',
-    healthScore: 65,
-    trend: 'stable',
-    summary: 'Kondisi stabil, perhatikan biaya operasional',
-  },
-];
+import { aiAnalysisService } from '@/lib/databaseService';
+import { useAuthStore } from '@/lib/authStore';
+import ReactMarkdown from 'react-markdown';
 
 export default function AnalysisHistory() {
+  const { user } = useAuthStore();
+
+  const { data: analyses, isLoading } = useQuery({
+    queryKey: ['ai-analyses', user?.$id],
+    queryFn: () => aiAnalysisService.listAnalyses(user!.$id),
+    enabled: !!user,
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Riwayat Analisa
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Memuat riwayat...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!analyses || analyses.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Riwayat Analisa
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Belum ada riwayat analisa. Mulai analisa pertama Anda!
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -45,67 +58,64 @@ export default function AnalysisHistory() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {mockHistory.map((item, index) => (
-            <div
-              key={item.id}
-              className="flex gap-4 pb-4 border-b last:border-0 last:pb-0"
-            >
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                    item.healthScore >= 70
-                      ? 'bg-primary/20 text-primary'
-                      : item.healthScore >= 40
-                        ? 'bg-yellow-500/20 text-yellow-600'
-                        : 'bg-destructive/20 text-destructive'
-                  }`}
-                >
-                  {item.healthScore}
-                </div>
-                {index < mockHistory.length - 1 && (
-                  <div className="w-px h-full bg-border mt-2" />
-                )}
-              </div>
-
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2">
+        <div className="space-y-6">
+          {analyses.map((analysis, index) => {
+            const summary = JSON.parse(analysis.summary);
+            return (
+              <div
+                key={analysis.$id}
+                className="pb-6 border-b last:border-0 last:pb-0 space-y-3"
+              >
+                <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">
-                    {new Date(item.date).toLocaleDateString('id-ID', {
+                    {new Date(analysis.analysisDate).toLocaleDateString('id-ID', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </p>
-                  {item.trend === 'up' ? (
-                    <Badge className="bg-primary/20 text-primary border-primary/30">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Naik
-                    </Badge>
-                  ) : item.trend === 'down' ? (
-                    <Badge variant="destructive">
-                      <TrendingDown className="w-3 h-3 mr-1" />
-                      Turun
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary">Stabil</Badge>
-                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {analysis.periodDays} hari
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground">{item.summary}</p>
-                <Button variant="ghost" size="sm" className="h-7 text-xs">
-                  Lihat Detail
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {mockHistory.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>Belum ada riwayat analisa</p>
-            <p className="text-sm">Lakukan analisa pertama Anda untuk melihat riwayat</p>
-          </div>
-        )}
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs">Pendapatan</p>
+                    <p className="font-medium text-green-600">
+                      Rp {summary.total_income?.toLocaleString('id-ID') || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Pengeluaran</p>
+                    <p className="font-medium text-red-600">
+                      Rp {summary.total_expense?.toLocaleString('id-ID') || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Net Balance</p>
+                    <p className={`font-medium ${summary.net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      Rp {summary.net_balance?.toLocaleString('id-ID') || 0}
+                    </p>
+                  </div>
+                </div>
+
+                {analysis.advice && (
+                  <details className="text-sm">
+                    <summary className="cursor-pointer text-primary font-medium">
+                      Lihat Rekomendasi AI
+                    </summary>
+                    <div className="mt-2 prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown>{analysis.advice}</ReactMarkdown>
+                    </div>
+                  </details>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );

@@ -406,6 +406,23 @@ export const aiAnalysisService = {
   },
 
   /**
+   * Get all AI analyses for a specific user (for components)
+   */
+  async listAnalyses(userId: string) {
+    try {
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        AI_ANALYSES_COLLECTION,
+        [Query.equal('userId', userId), Query.orderDesc('analysisDate'), Query.limit(10)]
+      );
+      return response.documents as unknown as AIAnalysis[];
+    } catch (error) {
+      console.error('Error fetching AI analyses:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Get a single AI analysis by ID
    */
   async get(analysisId: string) {
