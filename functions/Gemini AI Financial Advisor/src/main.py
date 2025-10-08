@@ -123,7 +123,7 @@ def analyze_transactions(transactions, categories):
     for txn in transactions:
         amount = txn.get("amount", 0)
         txn_type = txn.get("type", "")
-        category_id = txn.get("categoryId")
+        category_id = txn.get("category")  # Field name is "category" not "categoryId"
         category_name = categories.get(category_id, "Unknown")
         
         if txn_type == "income":

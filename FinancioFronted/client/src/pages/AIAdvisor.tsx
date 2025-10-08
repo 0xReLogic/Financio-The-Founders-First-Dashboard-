@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import AnalysisHistory from '@/components/AnalysisHistory';
 import ProgressiveLoading from '@/components/ProgressiveLoading';
 import { useToast } from '@/hooks/use-toast';
-import { aiFunctionService } from '@/lib/databaseService';
+import { aiFunctionService, aiAnalysisService } from '@/lib/databaseService';
 import { useAuthStore } from '@/lib/authStore';
 import ReactMarkdown from 'react-markdown';
 
@@ -16,7 +16,6 @@ export default function AIAdvisor() {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Fetch user credits
   const { data: credits, isLoading: creditsLoading } = useQuery({
@@ -25,14 +24,25 @@ export default function AIAdvisor() {
     enabled: !!user,
   });
 
+  // Fetch latest analysis (instead of local state)
+  const { data: latestAnalysis } = useQuery({
+    queryKey: ['latest-analysis', user?.$id],
+    queryFn: async () => {
+      const analyses = await aiAnalysisService.listAnalyses(user!.$id);
+      return analyses.length > 0 ? analyses[0] : null;
+    },
+    enabled: !!user,
+  });
+
   // Execute AI analysis mutation
   const analysisMutation = useMutation({
     mutationFn: () => aiFunctionService.executeAnalysis(user!.$id),
     onSuccess: (data) => {
-      setAnalysisResult(data);
       setIsAnalyzing(false);
+      // Invalidate queries to refetch latest analysis
       queryClient.invalidateQueries({ queryKey: ['ai-credits'] });
       queryClient.invalidateQueries({ queryKey: ['ai-analyses'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-analysis'] });
       toast({
         title: 'Analisa Selesai!',
         description: 'AI telah menganalisa kondisi keuangan Anda.',
@@ -80,8 +90,9 @@ export default function AIAdvisor() {
     }, 1500);
   };
 
-  const summary = analysisResult?.summary;
-  const advice = analysisResult?.advice;
+  // Parse latest analysis data
+  const summary = latestAnalysis ? JSON.parse(latestAnalysis.summary) : null;
+  const advice = latestAnalysis?.advice;
   const isLoading = creditsLoading;
 
   return (
@@ -102,7 +113,7 @@ export default function AIAdvisor() {
             <p className="text-sm text-muted-foreground">Memuat data...</p>
           </div>
         </div>
-      ) : !isAnalyzing && !analysisResult ? (
+      ) : !isAnalyzing && !latestAnalysis ? (
         <Card className="border-primary/20">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -136,7 +147,7 @@ export default function AIAdvisor() {
         <ProgressiveLoading onComplete={() => {}} duration={30000} />
       )}
 
-      {analysisResult && summary && (
+      {latestAnalysis && summary && (
         <>
           {/* Financial Summary Cards */}
           <div className="grid gap-4 md:grid-cols-3">
@@ -238,12 +249,11 @@ export default function AIAdvisor() {
               Export PDF
             </Button>
             <Button
-              variant="outline"
-              onClick={() => setAnalysisResult(null)}
-              data-testid="button-new-analysis"
+              onClick={handleAnalyze}
               disabled={!credits || credits.remainingCredits <= 0}
             >
-              Analisa Baru
+              <Sparkles className="w-4 h-4 mr-2" />
+              Analisa Ulang
             </Button>
           </div>
 
