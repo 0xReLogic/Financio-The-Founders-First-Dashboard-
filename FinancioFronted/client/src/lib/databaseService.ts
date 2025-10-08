@@ -1,5 +1,6 @@
-import { databases, account, storage, client } from './appwrite';
+import { databases, account, storage, client, functions } from './appwrite';
 import { ID, Query } from 'appwrite';
+import { ExecutionMethod } from 'appwrite';
 
 // Collection IDs from environment
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -10,6 +11,7 @@ const RATE_LIMITS_COLLECTION = import.meta.env.VITE_APPWRITE_COLLECTION_RATE_LIM
 const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_BUCKET_ID;
 const APPWRITE_ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
 const APPWRITE_PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+const AI_FUNCTION_ID = import.meta.env.VITE_APPWRITE_FUNCTION_AI_ADVISOR || 'gemini';
 
 // Debug: Log ALL import.meta.env to see what Vite loaded
 console.log('🔍 ALL VITE ENV VARS:', import.meta.env);
@@ -627,6 +629,72 @@ export const storageService = {
   },
 };
 
+// ==================== AI FUNCTION SERVICE ====================
+
+export const aiFunctionService = {
+  /**
+   * Execute AI financial analysis
+   */
+  async executeAnalysis(userId: string) {
+    try {
+      const execution = await functions.createExecution(
+        AI_FUNCTION_ID,
+        JSON.stringify({ userId }),
+        false, // async = false (wait for response)
+        '/',
+        ExecutionMethod.POST,
+        { 'Content-Type': 'application/json' }
+      );
+
+      // Parse response
+      if (execution.responseStatusCode === 200) {
+        const response = JSON.parse(execution.responseBody);
+        return response;
+      } else {
+        const error = JSON.parse(execution.responseBody);
+        throw new Error(error.error || 'Analysis failed');
+      }
+    } catch (error) {
+      console.error('Error executing AI analysis:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get user credits info
+   */
+  async getCredits(userId: string) {
+    try {
+      const rateLimit = await databases.getDocument(
+        DATABASE_ID,
+        RATE_LIMITS_COLLECTION,
+        userId
+      );
+      
+      return {
+        totalCredits: rateLimit.totalCredits || 10,
+        usedCredits: rateLimit.usedCredits || 0,
+        remainingCredits: (rateLimit.totalCredits || 10) - (rateLimit.usedCredits || 0),
+        isPaid: rateLimit.isPaid || false,
+        lastUsedAt: rateLimit.lastUsedAt
+      };
+    } catch (error: any) {
+      // If document doesn't exist, return default free tier
+      if (error.code === 404) {
+        return {
+          totalCredits: 10,
+          usedCredits: 0,
+          remainingCredits: 10,
+          isPaid: false,
+          lastUsedAt: null
+        };
+      }
+      console.error('Error getting credits:', error);
+      throw error;
+    }
+  }
+};
+
 // Export all services
 export const databaseService = {
   transactions: transactionService,
@@ -634,4 +702,5 @@ export const databaseService = {
   aiAnalyses: aiAnalysisService,
   rateLimits: rateLimitService,
   storage: storageService,
+  aiFunction: aiFunctionService,
 };

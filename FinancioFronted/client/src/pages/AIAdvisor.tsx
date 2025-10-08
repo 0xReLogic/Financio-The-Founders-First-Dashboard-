@@ -1,49 +1,69 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Sparkles, AlertTriangle, Lightbulb, Download } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Sparkles, AlertTriangle, Lightbulb, Download, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import AnalysisHistory from '@/components/AnalysisHistory';
 import ProgressiveLoading from '@/components/ProgressiveLoading';
 import { useToast } from '@/hooks/use-toast';
-import { aiAnalysisService, rateLimitService } from '@/lib/databaseService';
+import { aiFunctionService } from '@/lib/databaseService';
+import { useAuthStore } from '@/lib/authStore';
+import ReactMarkdown from 'react-markdown';
 
 export default function AIAdvisor() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
-  // Fetch latest AI analysis
-  const { data: analyses = [], isLoading: analysesLoading } = useQuery({
-    queryKey: ['ai-analyses'],
-    queryFn: () => aiAnalysisService.list(),
+  // Fetch user credits
+  const { data: credits, isLoading: creditsLoading } = useQuery({
+    queryKey: ['ai-credits', user?.$id],
+    queryFn: () => aiFunctionService.getCredits(user!.$id),
+    enabled: !!user,
   });
 
-  // Fetch rate limit
-  const { data: rateLimit } = useQuery({
-    queryKey: ['rate-limit-ai'],
-    queryFn: async () => {
-      const limits = await rateLimitService.list();
-      return limits.find(l => l.feature === 'ai_analysis');
+  // Execute AI analysis mutation
+  const analysisMutation = useMutation({
+    mutationFn: () => aiFunctionService.executeAnalysis(user!.$id),
+    onSuccess: (data) => {
+      setAnalysisResult(data);
+      setIsAnalyzing(false);
+      queryClient.invalidateQueries({ queryKey: ['ai-credits'] });
+      queryClient.invalidateQueries({ queryKey: ['ai-analyses'] });
+      toast({
+        title: 'Analisa Selesai!',
+        description: 'AI telah menganalisa kondisi keuangan Anda.',
+      });
+    },
+    onError: (error: any) => {
+      setIsAnalyzing(false);
+      const errorMessage = error.message || 'Gagal melakukan analisa';
+      toast({
+        title: 'Analisa Gagal',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     },
   });
 
-  const latestAnalysis = analyses[0]; // Already sorted by date in service
-  const usageCount = rateLimit?.count || 0;
-  const usageLimit = rateLimit?.limit || 10;
-
   const handleAnalyze = () => {
-    setIsAnalyzing(true);
-  };
+    if (!credits || credits.remainingCredits <= 0) {
+      toast({
+        title: 'Credit Habis',
+        description: 'Anda tidak memiliki credit tersisa. Upgrade ke premium untuk mendapatkan 50 credit tambahan!',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-  const handleAnalysisComplete = () => {
-    setIsAnalyzing(false);
-    setShowResults(true);
-    toast({
-      title: 'Analisa Selesai!',
-      description: 'AI telah menganalisa kondisi keuangan Anda.',
-    });
+    setIsAnalyzing(true);
+    // Simulate loading then execute
+    setTimeout(() => {
+      analysisMutation.mutate();
+    }, 2000);
   };
 
   const handleExportPDF = () => {
@@ -51,7 +71,7 @@ export default function AIAdvisor() {
       title: 'Mengekspor PDF',
       description: 'Laporan analisa sedang diunduh...',
     });
-    // Mock PDF export
+    // TODO: Implement PDF export
     setTimeout(() => {
       toast({
         title: 'PDF Berhasil Diunduh',
@@ -60,19 +80,9 @@ export default function AIAdvisor() {
     }, 1500);
   };
 
-  // Use latest analysis if available, otherwise show placeholder
-  const healthScore = latestAnalysis?.healthScore || 0;
-  const concerns = latestAnalysis?.concerns || [];
-  const recommendations = latestAnalysis?.recommendations || [];
-
-  const scoreColor =
-    healthScore >= 70
-      ? '#65a30d'
-      : healthScore >= 40
-        ? '#facc15'
-        : '#dc2626';
-
-  const isLoading = analysesLoading;
+  const summary = analysisResult?.summary;
+  const advice = analysisResult?.advice;
+  const isLoading = creditsLoading;
 
   return (
     <div className="space-y-6">
@@ -92,7 +102,7 @@ export default function AIAdvisor() {
             <p className="text-sm text-muted-foreground">Memuat data...</p>
           </div>
         </div>
-      ) : !isAnalyzing && !showResults && !latestAnalysis ? (
+      ) : !isAnalyzing && !analysisResult ? (
         <Card className="border-primary/20">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -109,131 +119,114 @@ export default function AIAdvisor() {
               size="lg"
               onClick={handleAnalyze}
               data-testid="button-analyze"
+              disabled={!credits || credits.remainingCredits <= 0}
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Mulai Analisa
             </Button>
             <p className="text-sm text-muted-foreground mt-4" data-testid="text-usage">
-              Penggunaan: {usageCount}/{usageLimit} bulan ini
+              Credit tersisa: {credits?.remainingCredits || 0}/{credits?.totalCredits || 10}
+              {credits?.isPaid && <span className="ml-2 text-primary">(Premium)</span>}
             </p>
           </CardContent>
         </Card>
       ) : null}
 
       {isAnalyzing && (
-        <ProgressiveLoading onComplete={handleAnalysisComplete} duration={3000} />
+        <ProgressiveLoading onComplete={() => {}} duration={30000} />
       )}
 
-      {(showResults || latestAnalysis) && (
+      {analysisResult && summary && (
         <>
-          <Card data-testid="card-health-score">
-            <CardHeader>
-              <CardTitle>Skor Kesehatan Keuangan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-8">
-                <div className="relative">
-                  <svg width="120" height="120" className="transform -rotate-90">
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="50"
-                      fill="none"
-                      stroke="hsl(var(--muted))"
-                      strokeWidth="10"
-                    />
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="50"
-                      fill="none"
-                      stroke={scoreColor}
-                      strokeWidth="10"
-                      strokeDasharray={`${healthScore * 3.14} ${314 - healthScore * 3.14}`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold" style={{ color: scoreColor }}>
-                        {healthScore}
-                      </div>
-                      <div className="text-xs text-muted-foreground">dari 100</div>
-                    </div>
-                  </div>
+          {/* Financial Summary Cards */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Pendapatan</CardTitle>
+                <TrendingUp className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  Rp {summary.total_income?.toLocaleString('id-ID') || 0}
                 </div>
-                <div className="flex-1">
-                  <p className="text-muted-foreground mb-2">
-                    Kesehatan keuangan bisnis Anda berada pada level{' '}
-                    <span className="font-semibold" style={{ color: scoreColor }}>
-                      {healthScore >= 70
-                        ? 'BAIK'
-                        : healthScore >= 40
-                          ? 'CUKUP'
-                          : 'PERLU PERHATIAN'}
-                    </span>
-                  </p>
-                  <Progress value={healthScore} className="h-2" />
+                <p className="text-xs text-muted-foreground">30 hari terakhir</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Pengeluaran</CardTitle>
+                <TrendingDown className="h-4 w-4 text-red-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  Rp {summary.total_expense?.toLocaleString('id-ID') || 0}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <p className="text-xs text-muted-foreground">30 hari terakhir</p>
+              </CardContent>
+            </Card>
 
-          <Card data-testid="card-concerns">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-                Perhatian ({concerns.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {concerns.length > 0 ? (
-                <ul className="space-y-3">
-                  {concerns.map((concern, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-3 p-3 bg-destructive/5 rounded-md border border-destructive/20"
-                    >
-                      <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{concern}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Tidak ada perhatian khusus saat ini
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Net Balance</CardTitle>
+                <DollarSign className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${summary.net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  Rp {summary.net_balance?.toLocaleString('id-ID') || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {summary.transaction_count || 0} transaksi
                 </p>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card data-testid="card-recommendations">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-[#facc15]" />
-                Rekomendasi ({recommendations.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recommendations.length > 0 ? (
-                <ul className="space-y-3">
-                  {recommendations.map((recommendation, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-3 p-3 bg-[#65a30d]/5 rounded-md border border-[#65a30d]/20"
-                    >
-                      <Lightbulb className="w-4 h-4 text-[#facc15] mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{recommendation}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Belum ada rekomendasi
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Expense Breakdown */}
+          {summary.expense_by_category && Object.keys(summary.expense_by_category).length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Pengeluaran per Kategori</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {Object.entries(summary.expense_by_category)
+                    .sort(([, a]: any, [, b]: any) => b - a)
+                    .map(([category, amount]: any) => {
+                      const percentage = (amount / summary.total_expense * 100).toFixed(1);
+                      return (
+                        <div key={category} className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium">{category}</span>
+                            <span className="text-muted-foreground">
+                              Rp {amount.toLocaleString('id-ID')} ({percentage}%)
+                            </span>
+                          </div>
+                          <Progress value={parseFloat(percentage)} className="h-2" />
+                        </div>
+                      );
+                    })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* AI Generated Advice */}
+          {advice && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Analisa & Rekomendasi AI
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>{advice}</ReactMarkdown>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="flex justify-center gap-3">
             <Button
@@ -246,8 +239,9 @@ export default function AIAdvisor() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => setShowResults(false)}
+              onClick={() => setAnalysisResult(null)}
               data-testid="button-new-analysis"
+              disabled={!credits || credits.remainingCredits <= 0}
             >
               Analisa Baru
             </Button>
