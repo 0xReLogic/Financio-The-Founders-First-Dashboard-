@@ -679,15 +679,33 @@ export const aiFunctionService = {
         lastUsedAt: rateLimit.lastUsedAt
       };
     } catch (error: any) {
-      // If document doesn't exist, return default free tier
+      // If document doesn't exist, create it with free tier credits
       if (error.code === 404) {
-        return {
-          totalCredits: 10,
-          usedCredits: 0,
-          remainingCredits: 10,
-          isPaid: false,
-          lastUsedAt: null
-        };
+        try {
+          const newRateLimit = await databases.createDocument(
+            DATABASE_ID,
+            RATE_LIMITS_COLLECTION,
+            userId,
+            {
+              userId: userId,
+              totalCredits: 10,
+              usedCredits: 0,
+              isPaid: false,
+              lastUsedAt: null
+            }
+          );
+          
+          return {
+            totalCredits: 10,
+            usedCredits: 0,
+            remainingCredits: 10,
+            isPaid: false,
+            lastUsedAt: null
+          };
+        } catch (createError) {
+          console.error('Error creating rate limit document:', createError);
+          throw createError;
+        }
       }
       console.error('Error getting credits:', error);
       throw error;
