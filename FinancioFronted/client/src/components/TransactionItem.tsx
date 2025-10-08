@@ -6,6 +6,7 @@ import { Transaction } from '@shared/types';
 import { formatCurrency, formatDate } from '@/lib/mockData';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
+import { storageService } from '@/lib/databaseService';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -13,7 +14,6 @@ interface TransactionItemProps {
   onDelete?: (id: string) => void;
   onViewReceipt?: (transaction: Transaction) => void;
 }
-
 export default function TransactionItem({
   transaction,
   onEdit,
@@ -31,6 +31,19 @@ export default function TransactionItem({
   const handleDelete = () => {
     onDelete?.(transaction.id);
     setDeleteOpen(false);
+  };
+
+  const handleViewReceipt = () => {
+    if (transaction.receiptUrl) {
+      try {
+        const url = storageService.getFileUrl(transaction.receiptUrl);
+        console.log('📸 Receipt URL:', url);
+        console.log('📸 File ID:', transaction.receiptUrl);
+        window.open(url, '_blank');
+      } catch (error) {
+        console.error('Error opening receipt:', error);
+      }
+    }
   };
 
   return (
@@ -91,7 +104,8 @@ export default function TransactionItem({
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => onViewReceipt?.(transaction)}
+                onClick={handleViewReceipt}
+                title="Lihat Bukti Transaksi"
                 data-testid={`button-view-receipt-${transaction.id}`}
               >
                 <FileText className="w-4 h-4" />

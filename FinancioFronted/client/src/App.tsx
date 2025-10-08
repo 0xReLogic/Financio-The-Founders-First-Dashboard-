@@ -28,12 +28,21 @@ import NotFound from '@/pages/not-found';
 function AuthenticatedLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = useAuthStore((state) => state.user);
 
-  // Auto-seed categories on first login
+  // Auto-seed categories on first login (only once per user)
   useEffect(() => {
     if (user) {
-      seedIfEmpty().catch((error) => {
-        console.error('Failed to seed categories:', error);
-      });
+      const seedKey = `categories_seeded_${user.$id}`;
+      const hasSeeded = localStorage.getItem(seedKey);
+      
+      if (!hasSeeded) {
+        seedIfEmpty()
+          .then(() => {
+            localStorage.setItem(seedKey, 'true');
+          })
+          .catch((error) => {
+            console.error('Failed to seed categories:', error);
+          });
+      }
     }
   }, [user]);
 

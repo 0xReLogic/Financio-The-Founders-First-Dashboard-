@@ -1,4 +1,4 @@
-import { databases, account } from './appwrite';
+import { databases, account, storage, client } from './appwrite';
 import { ID, Query } from 'appwrite';
 
 // Collection IDs from environment
@@ -7,6 +7,30 @@ const TRANSACTIONS_COLLECTION = import.meta.env.VITE_APPWRITE_COLLECTION_TRANSAC
 const CATEGORIES_COLLECTION = import.meta.env.VITE_APPWRITE_COLLECTION_CATEGORIES;
 const AI_ANALYSES_COLLECTION = import.meta.env.VITE_APPWRITE_COLLECTION_AI_ANALYSES;
 const RATE_LIMITS_COLLECTION = import.meta.env.VITE_APPWRITE_COLLECTION_RATE_LIMITS;
+const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_BUCKET_ID;
+const APPWRITE_ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
+const APPWRITE_PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+
+// Debug: Log ALL import.meta.env to see what Vite loaded
+console.log('🔍 ALL VITE ENV VARS:', import.meta.env);
+
+// Debug: Log environment variables on load
+console.log('🔧 Database Service Config:', {
+  DATABASE_ID,
+  TRANSACTIONS_COLLECTION,
+  CATEGORIES_COLLECTION,
+  AI_ANALYSES_COLLECTION,
+  RATE_LIMITS_COLLECTION,
+});
+
+// Validate required env vars
+if (!DATABASE_ID || !TRANSACTIONS_COLLECTION || !CATEGORIES_COLLECTION) {
+  console.error('❌ Missing required environment variables!');
+  console.error('DATABASE_ID:', DATABASE_ID);
+  console.error('TRANSACTIONS_COLLECTION:', TRANSACTIONS_COLLECTION);
+  console.error('CATEGORIES_COLLECTION:', CATEGORIES_COLLECTION);
+  console.error('Please check your .env file in FinancioFronted/ folder and restart the dev server.');
+}
 
 // ==================== TYPES ====================
 
@@ -536,10 +560,78 @@ export const rateLimitService = {
   },
 };
 
+// ==================== STORAGE (RECEIPTS) ====================
+
+export const storageService = {
+  /**
+   * Upload a receipt file
+   */
+  async uploadReceipt(file: File) {
+    try {
+      const user = await account.get();
+      const response = await storage.createFile(
+        STORAGE_BUCKET_ID,
+        ID.unique(),
+        file,
+        [
+          `read("user:${user.$id}")`,
+          `update("user:${user.$id}")`,
+          `delete("user:${user.$id}")`,
+        ]
+      );
+      return response;
+    } catch (error) {
+      console.error('Error uploading receipt:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a receipt file
+   */
+  async deleteReceipt(fileId: string) {
+    try {
+      await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
+    } catch (error) {
+      console.error('Error deleting receipt:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get receipt file URL for preview
+   * Using direct URL construction for better compatibility
+   */
+  getFileUrl(fileId: string) {
+    try {
+      // Build URL manually to ensure proper format
+      // Format: {endpoint}/storage/buckets/{bucketId}/files/{fileId}/view?project={projectId}
+      return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_BUCKET_ID}/files/${fileId}/view?project=${APPWRITE_PROJECT_ID}`;
+    } catch (error) {
+      console.error('Error getting file URL:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get receipt file download URL
+   */
+  getFileDownload(fileId: string) {
+    try {
+      // Format: {endpoint}/storage/buckets/{bucketId}/files/{fileId}/download?project={projectId}
+      return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_BUCKET_ID}/files/${fileId}/download?project=${APPWRITE_PROJECT_ID}`;
+    } catch (error) {
+      console.error('Error getting file download URL:', error);
+      throw error;
+    }
+  },
+};
+
 // Export all services
 export const databaseService = {
   transactions: transactionService,
   categories: categoryService,
   aiAnalyses: aiAnalysisService,
   rateLimits: rateLimitService,
+  storage: storageService,
 };

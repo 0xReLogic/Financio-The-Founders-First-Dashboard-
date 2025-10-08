@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Sparkles, AlertTriangle, Lightbulb, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,12 +7,31 @@ import { Progress } from '@/components/ui/progress';
 import AnalysisHistory from '@/components/AnalysisHistory';
 import ProgressiveLoading from '@/components/ProgressiveLoading';
 import { useToast } from '@/hooks/use-toast';
-import { mockAIAnalysis } from '@/lib/mockData';
+import { aiAnalysisService, rateLimitService } from '@/lib/databaseService';
 
 export default function AIAdvisor() {
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
+
+  // Fetch latest AI analysis
+  const { data: analyses = [], isLoading: analysesLoading } = useQuery({
+    queryKey: ['ai-analyses'],
+    queryFn: () => aiAnalysisService.list(),
+  });
+
+  // Fetch rate limit
+  const { data: rateLimit } = useQuery({
+    queryKey: ['rate-limit-ai'],
+    queryFn: async () => {
+      const limits = await rateLimitService.list();
+      return limits.find(l => l.feature === 'ai_analysis');
+    },
+  });
+
+  const latestAnalysis = analyses[0]; // Already sorted by date in service
+  const usageCount = rateLimit?.count || 0;
+  const usageLimit = rateLimit?.limit || 10;
 
   const handleAnalyze = () => {
     setIsAnalyzing(true);
@@ -40,12 +60,19 @@ export default function AIAdvisor() {
     }, 1500);
   };
 
+  // Use latest analysis if available, otherwise show placeholder
+  const healthScore = latestAnalysis?.healthScore || 0;
+  const concerns = latestAnalysis?.concerns || [];
+  const recommendations = latestAnalysis?.recommendations || [];
+
   const scoreColor =
-    mockAIAnalysis.healthScore >= 70
+    healthScore >= 70
       ? '#65a30d'
-      : mockAIAnalysis.healthScore >= 40
+      : healthScore >= 40
         ? '#facc15'
         : '#dc2626';
+
+  const isLoading = analysesLoading;
 
   return (
     <div className="space-y-6">
@@ -58,7 +85,14 @@ export default function AIAdvisor() {
         </p>
       </div>
 
-      {!isAnalyzing && !showResults && (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center space-y-2">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-sm text-muted-foreground">Memuat data...</p>
+          </div>
+        </div>
+      ) : !isAnalyzing && !showResults && !latestAnalysis ? (
         <Card className="border-primary/20">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -80,18 +114,17 @@ export default function AIAdvisor() {
               Mulai Analisa
             </Button>
             <p className="text-sm text-muted-foreground mt-4" data-testid="text-usage">
-              Penggunaan: {mockAIAnalysis.usageCount}/{mockAIAnalysis.usageLimit}{' '}
-              bulan ini
+              Penggunaan: {usageCount}/{usageLimit} bulan ini
             </p>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {isAnalyzing && (
         <ProgressiveLoading onComplete={handleAnalysisComplete} duration={3000} />
       )}
 
-      {showResults && (
+      {(showResults || latestAnalysis) && (
         <>
           <Card data-testid="card-health-score">
             <CardHeader>
@@ -116,14 +149,14 @@ export default function AIAdvisor() {
                       fill="none"
                       stroke={scoreColor}
                       strokeWidth="10"
-                      strokeDasharray={`${mockAIAnalysis.healthScore * 3.14} ${314 - mockAIAnalysis.healthScore * 3.14}`}
+                      strokeDasharray={`${healthScore * 3.14} ${314 - healthScore * 3.14}`}
                       strokeLinecap="round"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-3xl font-bold" style={{ color: scoreColor }}>
-                        {mockAIAnalysis.healthScore}
+                        {healthScore}
                       </div>
                       <div className="text-xs text-muted-foreground">dari 100</div>
                     </div>
@@ -133,14 +166,14 @@ export default function AIAdvisor() {
                   <p className="text-muted-foreground mb-2">
                     Kesehatan keuangan bisnis Anda berada pada level{' '}
                     <span className="font-semibold" style={{ color: scoreColor }}>
-                      {mockAIAnalysis.healthScore >= 70
+                      {healthScore >= 70
                         ? 'BAIK'
-                        : mockAIAnalysis.healthScore >= 40
+                        : healthScore >= 40
                           ? 'CUKUP'
                           : 'PERLU PERHATIAN'}
                     </span>
                   </p>
-                  <Progress value={mockAIAnalysis.healthScore} className="h-2" />
+                  <Progress value={healthScore} className="h-2" />
                 </div>
               </div>
             </CardContent>
@@ -150,21 +183,27 @@ export default function AIAdvisor() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-destructive" />
-                Perhatian ({mockAIAnalysis.concerns.length})
+                Perhatian ({concerns.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-3">
-                {mockAIAnalysis.concerns.map((concern, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-3 p-3 bg-destructive/5 rounded-md border border-destructive/20"
-                  >
-                    <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{concern}</span>
-                  </li>
-                ))}
-              </ul>
+              {concerns.length > 0 ? (
+                <ul className="space-y-3">
+                  {concerns.map((concern, index) => (
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 p-3 bg-destructive/5 rounded-md border border-destructive/20"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">{concern}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Tidak ada perhatian khusus saat ini
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -172,21 +211,27 @@ export default function AIAdvisor() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-[#facc15]" />
-                Rekomendasi ({mockAIAnalysis.recommendations.length})
+                Rekomendasi ({recommendations.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-3">
-                {mockAIAnalysis.recommendations.map((recommendation, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-3 p-3 bg-[#65a30d]/5 rounded-md border border-[#65a30d]/20"
-                  >
-                    <Lightbulb className="w-4 h-4 text-[#facc15] mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{recommendation}</span>
-                  </li>
-                ))}
-              </ul>
+              {recommendations.length > 0 ? (
+                <ul className="space-y-3">
+                  {recommendations.map((recommendation, index) => (
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 p-3 bg-[#65a30d]/5 rounded-md border border-[#65a30d]/20"
+                    >
+                      <Lightbulb className="w-4 h-4 text-[#facc15] mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">{recommendation}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Belum ada rekomendasi
+                </p>
+              )}
             </CardContent>
           </Card>
 

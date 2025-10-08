@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -17,8 +18,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { mockCategories } from '@/lib/mockData';
+import FileUploadPreview from '@/components/FileUploadPreview';
+import { categoryService, transactionService, storageService } from '@/lib/databaseService';
 import { Transaction } from '@shared/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface EditTransactionDialogProps {
   transaction: Transaction | null;
@@ -38,36 +41,121 @@ export default function EditTransactionDialog({
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [currentReceiptId, setCurrentReceiptId] = useState<string | undefined>();
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch categories from database
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.list(),
+  });
+
+  // Update transaction mutation
+  const updateMutation = useMutation({
+    mutationFn: async (data: {
+      id: string;
+      type: 'income' | 'expense';
+      amount: number;
+      category: string;
+      description: string;
+      date: string;
+      receiptId?: string;
+    }) => {
+      const { id, ...updateData } = data;
+      
+      // Handle receipt upload/delete
+      let receiptId = currentReceiptId;
+      
+      // If new receipt file uploaded
+      if (receiptFile) {
+        try {
+          // Delete old receipt if exists
+          if (currentReceiptId) {
+            await storageService.deleteReceipt(currentReceiptId);
+          }
+          // Upload new receipt
+          const uploadResult = await storageService.uploadReceipt(receiptFile);
+          receiptId = uploadResult.$id;
+        } catch (error) {
+          console.error('Error handling receipt:', error);
+          throw new Error('Gagal mengupdate bukti transaksi');
+        }
+      }
+      
+      return await transactionService.update(id, { ...updateData, receiptId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      toast({
+        title: 'Berhasil!',
+        description: 'Transaksi berhasil diupdate',
+      });
+      setReceiptFile(null);
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      console.error('Error updating transaction:', error);
+      toast({
+        title: 'Gagal',
+        description: error instanceof Error ? error.message : 'Gagal mengupdate transaksi. Silakan coba lagi.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   useEffect(() => {
     if (transaction) {
       setType(transaction.type);
       setAmount(transaction.amount.toString());
-      setCategory(transaction.category);
+      // Find category ID from name
+      const cat = categories.find(c => c.name === transaction.category);
+      setCategory(cat?.$id || '');
       setDescription(transaction.description);
       setDate(transaction.date.toISOString().split('T')[0]);
+      setCurrentReceiptId(transaction.receiptUrl);
+      setReceiptFile(null);
     }
-  }, [transaction]);
+  }, [transaction, categories]);
+
+  // Reset category when type changes
+  useEffect(() => {
+    if (category) {
+      const currentCategory = categories.find(c => c.$id === category);
+      if (currentCategory && currentCategory.type !== type) {
+        setCategory('');
+      }
+    }
+  }, [type, category, categories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!transaction) return;
 
-    const updatedTransaction: Transaction = {
-      ...transaction,
-      type,
-      amount: parseFloat(amount),
-      category,
-      description,
-      date: new Date(date),
-    };
+    // Parse amount (remove dots and commas)
+    const parsedAmount = parseFloat(amount.replace(/\./g, '').replace(/,/g, '.'));
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast({
+        title: 'Error',
+        description: 'Jumlah tidak valid',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    console.log('Transaction updated:', updatedTransaction);
-    onSave(updatedTransaction);
-    onOpenChange(false);
+    updateMutation.mutate({
+      id: transaction.id,
+      type,
+      amount: parsedAmount,
+      category: category,
+      description,
+      date: new Date(date).toISOString(),
+    });
   };
 
-  const filteredCategories = mockCategories.filter((cat) => cat.type === type);
+  const filteredCategories = categories.filter((cat) => cat.type === type);
 
   if (!transaction) return null;
 
@@ -119,7 +207,7 @@ export default function EditTransactionDialog({
               </SelectTrigger>
               <SelectContent>
                 {filteredCategories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.name}>
+                  <SelectItem key={cat.$id} value={cat.$id}>
                     {cat.name}
                   </SelectItem>
                 ))}
@@ -148,6 +236,27 @@ export default function EditTransactionDialog({
               onChange={(e) => setDate(e.target.value)}
               data-testid="input-date"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Bukti Transaksi (Opsional)</Label>
+            {currentReceiptId && !receiptFile && (
+              <div className="text-sm text-muted-foreground mb-2">
+                <a 
+                  href={storageService.getFileUrl(currentReceiptId)} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Lihat bukti saat ini
+                </a>
+              </div>
+            )}
+            <FileUploadPreview
+              onFileSelect={setReceiptFile}
+              accept="image/*,.pdf"
+              maxSizeMB={5}
             />
           </div>
 

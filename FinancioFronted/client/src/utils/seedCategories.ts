@@ -12,31 +12,31 @@ const defaultIncomeCategories: Omit<Category, '$id' | '$createdAt' | '$updatedAt
   {
     name: 'Sales Revenue',
     type: 'income',
-    color: 'green',
+    color: '#65a30d', // green
     icon: 'TrendingUp',
   },
   {
     name: 'Service Income',
     type: 'income',
-    color: 'emerald',
+    color: '#10b981', // emerald
     icon: 'Briefcase',
   },
   {
     name: 'Investment Returns',
     type: 'income',
-    color: 'lime',
+    color: '#84cc16', // lime
     icon: 'PiggyBank',
   },
   {
     name: 'Grant/Funding',
     type: 'income',
-    color: 'teal',
+    color: '#14b8a6', // teal
     icon: 'Award',
   },
   {
     name: 'Other Income',
     type: 'income',
-    color: 'cyan',
+    color: '#06b6d4', // cyan
     icon: 'DollarSign',
   },
 ];
@@ -46,61 +46,61 @@ const defaultExpenseCategories: Omit<Category, '$id' | '$createdAt' | '$updatedA
   {
     name: 'Salary & Wages',
     type: 'expense',
-    color: 'red',
+    color: '#dc2626', // red
     icon: 'Users',
   },
   {
     name: 'Marketing & Ads',
     type: 'expense',
-    color: 'orange',
+    color: '#f97316', // orange
     icon: 'Megaphone',
   },
   {
     name: 'Software & Tools',
     type: 'expense',
-    color: 'purple',
+    color: '#a855f7', // purple
     icon: 'Code',
   },
   {
     name: 'Office Rent',
     type: 'expense',
-    color: 'pink',
+    color: '#ec4899', // pink
     icon: 'Building',
   },
   {
     name: 'Utilities',
     type: 'expense',
-    color: 'yellow',
+    color: '#facc15', // yellow
     icon: 'Zap',
   },
   {
     name: 'Transportation',
     type: 'expense',
-    color: 'blue',
+    color: '#3b82f6', // blue
     icon: 'Car',
   },
   {
     name: 'Legal & Accounting',
     type: 'expense',
-    color: 'indigo',
+    color: '#6366f1', // indigo
     icon: 'Scale',
   },
   {
     name: 'Inventory',
     type: 'expense',
-    color: 'amber',
+    color: '#f59e0b', // amber
     icon: 'Package',
   },
   {
     name: 'Insurance',
     type: 'expense',
-    color: 'rose',
+    color: '#f43f5e', // rose
     icon: 'Shield',
   },
   {
     name: 'Other Expenses',
     type: 'expense',
-    color: 'gray',
+    color: '#6b7280', // gray
     icon: 'MoreHorizontal',
   },
 ];

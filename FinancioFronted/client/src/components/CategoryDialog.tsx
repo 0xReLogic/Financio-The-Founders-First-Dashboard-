@@ -117,6 +117,11 @@ export default function CategoryDialog({
   });
 
   const handleSubmit = () => {
+    // Prevent multiple submissions
+    if (createMutation.isPending || updateMutation.isPending) {
+      return;
+    }
+
     if (!name.trim()) {
       toast({
         title: 'Error',
@@ -147,7 +152,12 @@ export default function CategoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" onKeyDown={(e) => {
+        if (e.key === 'Enter' && !createMutation.isPending && !updateMutation.isPending) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      }}>
         <DialogHeader>
           <DialogTitle>
             {category ? 'Edit Kategori' : 'Tambah Kategori'}
@@ -224,11 +234,17 @@ export default function CategoryDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={createMutation.isPending || updateMutation.isPending}>
             Batal
           </Button>
-          <Button onClick={handleSubmit} data-testid="button-save-category">
-            {category ? 'Simpan Perubahan' : 'Tambah Kategori'}
+          <Button 
+            onClick={handleSubmit} 
+            data-testid="button-save-category"
+            disabled={createMutation.isPending || updateMutation.isPending}
+          >
+            {createMutation.isPending || updateMutation.isPending 
+              ? 'Menyimpan...' 
+              : category ? 'Simpan Perubahan' : 'Tambah Kategori'}
           </Button>
         </DialogFooter>
       </DialogContent>
