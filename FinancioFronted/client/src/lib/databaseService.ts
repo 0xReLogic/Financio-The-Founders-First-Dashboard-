@@ -73,9 +73,9 @@ export interface AIAnalysis {
   $updatedAt?: string;
   userId: string;
   analysisDate: string; // ISO 8601 format
-  healthScore: number; // 0-100
-  concerns: string[];
-  recommendations: string[];
+  summary: string; // JSON string containing total_income, total_expense, net_balance, expense_breakdown
+  advice: string; // Markdown formatted AI advice
+  periodDays: number; // Analysis period in days
 }
 
 export interface RateLimit {

@@ -1,5 +1,4 @@
 import { Switch, Route } from 'wouter';
-import { useEffect } from 'react';
 import { queryClient } from './lib/queryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -11,7 +10,6 @@ import { Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuthStore } from '@/lib/authStore';
-import { seedIfEmpty } from '@/utils/seedCategories';
 import Dashboard from '@/pages/Dashboard';
 import Transactions from '@/pages/Transactions';
 import Categories from '@/pages/Categories';
@@ -27,24 +25,6 @@ import NotFound from '@/pages/not-found';
 
 function AuthenticatedLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = useAuthStore((state) => state.user);
-
-  // Auto-seed categories on first login (only once per user)
-  useEffect(() => {
-    if (user) {
-      const seedKey = `categories_seeded_${user.$id}`;
-      const hasSeeded = localStorage.getItem(seedKey);
-      
-      if (!hasSeeded) {
-        seedIfEmpty()
-          .then(() => {
-            localStorage.setItem(seedKey, 'true');
-          })
-          .catch((error) => {
-            console.error('Failed to seed categories:', error);
-          });
-      }
-    }
-  }, [user]);
 
   const style = {
     '--sidebar-width': '16rem',

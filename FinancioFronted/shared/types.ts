@@ -26,10 +26,12 @@ export interface StatsData {
 }
 
 export interface AIAnalysis {
-  healthScore: number;
-  concerns: string[];
-  recommendations: string[];
-  analyzedAt: Date;
-  usageCount: number;
-  usageLimit: number;
+  $id: string;
+  userId: string;
+  analysisDate: string;
+  summary: string; // JSON string containing total_income, total_expense, net_balance, expense_breakdown
+  advice: string; // Markdown formatted AI advice
+  periodDays: number;
+  $createdAt?: string;
+  $updatedAt?: string;
 }

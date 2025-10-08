@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { aiAnalysisService } from '@/lib/databaseService';
 import { useAuthStore } from '@/lib/authStore';
 import ReactMarkdown from 'react-markdown';
