@@ -6,22 +6,16 @@ export interface User extends Models.User<Models.Preferences> {}
 class AuthService {
   /**
    * Register new user with email & password
-   * Sends verification email instead of auto-login
+   * Auto-login after registration (no email verification required)
    */
   async register(email: string, password: string, name: string): Promise<User> {
     try {
       const user = await account.create(ID.unique(), email, password, name);
       console.log('✅ User registered:', user);
       
-      // Send verification email
-      try {
-        const verificationUrl = `${window.location.origin}/verify-email`;
-        await account.createVerification(verificationUrl);
-        console.log('✅ Verification email sent to:', email);
-      } catch (verifyError) {
-        console.warn('⚠️ Could not send verification email:', verifyError);
-        // Don't fail registration if email fails
-      }
+      // Auto-login after successful registration
+      await account.createEmailPasswordSession(email, password);
+      console.log('✅ Auto-login successful');
       
       return user;
     } catch (error: any) {

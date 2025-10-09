@@ -11,17 +11,85 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-
 import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/lib/authStore';
+import { authService } from '@/lib/authService';
+import { useState, useEffect } from 'react';
+
+interface UserPreferences {
+  businessName?: string;
+  businessType?: string;
+  ownerName?: string;
+  currency?: string;
+  dateFormat?: string;
+  emailNotifications?: boolean;
+  transactionAlerts?: boolean;
+  aiInsights?: boolean;
+  theme?: string;
+  accentColor?: string;
+}
 
 export default function Settings() {
   const { toast } = useToast();
+  const { user } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [prefs, setPrefs] = useState<UserPreferences>({
+    businessName: '',
+    businessType: 'food',
+    ownerName: user?.name || '',
+    currency: 'idr',
+    dateFormat: 'id',
+    emailNotifications: true,
+    transactionAlerts: true,
+    aiInsights: true,
+    theme: 'system',
+    accentColor: 'green',
+  });
 
-  const handleSave = () => {
-    toast({
-      title: 'Pengaturan disimpan',
-      description: 'Perubahan Anda telah berhasil disimpan',
-    });
+  // Load user preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser?.prefs) {
+          setPrefs((prev) => ({
+            ...prev,
+            ...currentUser.prefs,
+            ownerName: currentUser.name,
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load preferences:', error);
+      }
+    };
+    loadPreferences();
+  }, []);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Update user preferences in Appwrite
+      const { account } = await import('@/lib/appwrite');
+      await account.updatePrefs(prefs);
+
+      // Update name if changed
+      if (prefs.ownerName && prefs.ownerName !== user?.name) {
+        await authService.updateName(prefs.ownerName);
+      }
+
+      toast({
+        title: '✅ Pengaturan disimpan',
+        description: 'Perubahan Anda telah berhasil disimpan',
+      });
+    } catch (error: any) {
+      toast({
+        title: '❌ Gagal menyimpan',
+        description: error.message || 'Terjadi kesalahan saat menyimpan pengaturan',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,13 +121,17 @@ export default function Settings() {
                 <Input
                   id="business-name"
                   placeholder="Warung Kopi Pak Andi"
-                  defaultValue="Warung Kopi Pak Andi"
+                  value={prefs.businessName || ''}
+                  onChange={(e) => setPrefs({ ...prefs, businessName: e.target.value })}
                   data-testid="input-business-name"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="business-type">Jenis Bisnis</Label>
-                <Select defaultValue="food">
+                <Select
+                  value={prefs.businessType}
+                  onValueChange={(value) => setPrefs({ ...prefs, businessType: value })}
+                >
                   <SelectTrigger id="business-type" data-testid="select-business-type">
                     <SelectValue />
                   </SelectTrigger>
@@ -76,7 +148,8 @@ export default function Settings() {
                 <Input
                   id="owner-name"
                   placeholder="Pak Andi"
-                  defaultValue="Pak Andi"
+                  value={prefs.ownerName || ''}
+                  onChange={(e) => setPrefs({ ...prefs, ownerName: e.target.value })}
                   data-testid="input-owner-name"
                 />
               </div>
@@ -90,7 +163,10 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currency">Mata Uang</Label>
-                <Select defaultValue="idr">
+                <Select
+                  value={prefs.currency}
+                  onValueChange={(value) => setPrefs({ ...prefs, currency: value })}
+                >
                   <SelectTrigger id="currency" data-testid="select-currency">
                     <SelectValue />
                   </SelectTrigger>
@@ -103,7 +179,10 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="date-format">Format Tanggal</Label>
-                <Select defaultValue="id">
+                <Select
+                  value={prefs.dateFormat}
+                  onValueChange={(value) => setPrefs({ ...prefs, dateFormat: value })}
+                >
                   <SelectTrigger id="date-format" data-testid="select-date-format">
                     <SelectValue />
                   </SelectTrigger>
@@ -131,7 +210,14 @@ export default function Settings() {
                     Terima update via email
                   </p>
                 </div>
-                <Switch id="email-notifications" defaultChecked data-testid="switch-email" />
+                <Switch
+                  id="email-notifications"
+                  checked={prefs.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    setPrefs({ ...prefs, emailNotifications: checked })
+                  }
+                  data-testid="switch-email"
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -140,7 +226,14 @@ export default function Settings() {
                     Notifikasi untuk transaksi besar
                   </p>
                 </div>
-                <Switch id="transaction-alerts" defaultChecked data-testid="switch-transaction-alerts" />
+                <Switch
+                  id="transaction-alerts"
+                  checked={prefs.transactionAlerts}
+                  onCheckedChange={(checked) =>
+                    setPrefs({ ...prefs, transactionAlerts: checked })
+                  }
+                  data-testid="switch-transaction-alerts"
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -149,7 +242,12 @@ export default function Settings() {
                     Rekomendasi otomatis dari AI
                   </p>
                 </div>
-                <Switch id="ai-insights" defaultChecked data-testid="switch-ai-insights" />
+                <Switch
+                  id="ai-insights"
+                  checked={prefs.aiInsights}
+                  onCheckedChange={(checked) => setPrefs({ ...prefs, aiInsights: checked })}
+                  data-testid="switch-ai-insights"
+                />
               </div>
             </CardContent>
           </Card>
@@ -163,7 +261,10 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="theme">Tema</Label>
-                <Select defaultValue="system">
+                <Select
+                  value={prefs.theme}
+                  onValueChange={(value) => setPrefs({ ...prefs, theme: value })}
+                >
                   <SelectTrigger id="theme" data-testid="select-theme">
                     <SelectValue />
                   </SelectTrigger>
@@ -176,7 +277,10 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="accent-color">Warna Aksen</Label>
-                <Select defaultValue="green">
+                <Select
+                  value={prefs.accentColor}
+                  onValueChange={(value) => setPrefs({ ...prefs, accentColor: value })}
+                >
                   <SelectTrigger id="accent-color" data-testid="select-accent">
                     <SelectValue />
                   </SelectTrigger>
@@ -197,8 +301,8 @@ export default function Settings() {
         <Button variant="outline" data-testid="button-cancel">
           Batal
         </Button>
-        <Button onClick={handleSave} data-testid="button-save">
-          Simpan Perubahan
+        <Button onClick={handleSave} disabled={loading} data-testid="button-save">
+          {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
         </Button>
       </div>
     </div>
