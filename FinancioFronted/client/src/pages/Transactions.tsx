@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Receipt } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import TransactionItem from '@/components/TransactionItem';
@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { transactionService, categoryService } from '@/lib/databaseService';
+import { createRealtimeSubscription, buildChannels } from '@/lib/realtimeService';
 import type { Transaction } from '@shared/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -58,6 +59,29 @@ export default function Transactions() {
       });
     },
   });
+
+  // Realtime subscription for live transaction updates
+  useEffect(() => {
+    const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+    const transactionsCollectionId = import.meta.env.VITE_APPWRITE_COLLECTION_TRANSACTIONS;
+
+    if (!databaseId || !transactionsCollectionId) {
+      console.error('Missing database or collection configuration');
+      return;
+    }
+
+    const unsubscribe = createRealtimeSubscription(
+      buildChannels.transactions(databaseId, transactionsCollectionId),
+      (response) => {
+        console.log('Realtime event on Transactions page:', response);
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient]);
 
   // Convert database transactions to UI format
   const uiTransactions = useMemo((): Transaction[] => {

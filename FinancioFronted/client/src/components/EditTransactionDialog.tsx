@@ -207,7 +207,7 @@ export default function EditTransactionDialog({
               </SelectTrigger>
               <SelectContent>
                 {filteredCategories.map((cat) => (
-                  <SelectItem key={cat.$id} value={cat.$id}>
+                  <SelectItem key={cat.$id || cat.name} value={cat.$id || ''}>
                     {cat.name}
                   </SelectItem>
                 ))}

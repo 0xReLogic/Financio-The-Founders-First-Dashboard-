@@ -9,9 +9,10 @@ import AddTransactionDialog from '@/components/AddTransactionDialog';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/mockData';
 import { transactionService, categoryService } from '@/lib/databaseService';
+import { createRealtimeSubscription, buildChannels, isEventType } from '@/lib/realtimeService';
 import type { Transaction as UITransaction } from '@shared/types';
 import { useLocation } from 'wouter';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
@@ -52,6 +53,41 @@ export default function Dashboard() {
   });
 
   const isLoading = transactionsLoading || categoriesLoading;
+
+  // Realtime subscription for live dashboard updates
+  useEffect(() => {
+    const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+    const transactionsCollectionId = import.meta.env.VITE_APPWRITE_COLLECTION_TRANSACTIONS;
+
+    if (!databaseId || !transactionsCollectionId) {
+      console.error('Missing database or collection configuration');
+      return;
+    }
+
+    const unsubscribe = createRealtimeSubscription(
+      buildChannels.transactionEvents(databaseId, transactionsCollectionId),
+      (response) => {
+        console.log('Realtime event on Dashboard:', response);
+
+        // Invalidate queries to trigger refetch
+        if (isEventType(response.events, 'create')) {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          toast({
+            title: 'Transaksi Baru',
+            description: 'Dashboard telah diperbarui dengan transaksi terbaru',
+          });
+        } else if (isEventType(response.events, 'update')) {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        } else if (isEventType(response.events, 'delete')) {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient, toast]);
 
   // Convert database transactions to UI format
   const uiTransactions = useMemo((): UITransaction[] => {

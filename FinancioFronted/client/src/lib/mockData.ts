@@ -1,4 +1,4 @@
-import { Transaction, Category, StatsData, AIAnalysis } from '@shared/types';
+import { Transaction, Category, StatsData } from '@shared/types';
 
 // todo: remove mock functionality
 export const mockCategories: Category[] = [
@@ -62,24 +62,8 @@ export const mockStats: StatsData = {
   trend: 25,
 };
 
-// todo: remove mock functionality
-export const mockAIAnalysis: AIAnalysis = {
-  healthScore: 72,
-  concerns: [
-    'Pengeluaran operasional meningkat 15% dibanding bulan lalu',
-    'Rasio marketing terhadap pendapatan masih di bawah standar industri',
-    'Cash flow negatif terdeteksi pada minggu ke-3',
-  ],
-  recommendations: [
-    'Pertimbangkan renegoisasi kontrak supplier untuk mengurangi biaya operasional',
-    'Alokasikan 10-15% dari pendapatan untuk marketing digital',
-    'Buat buffer dana darurat minimal 3 bulan operating expenses',
-    'Diversifikasi sumber pendapatan untuk mengurangi risiko',
-  ],
-  analyzedAt: new Date(),
-  usageCount: 3,
-  usageLimit: 10,
-};
+// Note: Mock AI Analysis removed - now using real database data
+// AIAnalysis interface structure: { $id, userId, analysisDate, summary (JSON), advice (markdown), periodDays }
 
 export const formatCurrency = (amount: number): string => {
   return `Rp ${amount.toLocaleString('id-ID')}`;

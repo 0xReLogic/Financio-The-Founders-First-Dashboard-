@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, FolderOpen } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import CategoryDialog from '@/components/CategoryDialog';
 import EmptyState from '@/components/EmptyState';
 import { useToast } from '@/hooks/use-toast';
 import { categoryService, transactionService, type Category } from '@/lib/databaseService';
+import { createRealtimeSubscription, buildChannels } from '@/lib/realtimeService';
 import { formatCurrency } from '@/lib/mockData';
 
 export default function Categories() {
@@ -76,6 +77,29 @@ export default function Categories() {
     setSelectedCategory(null);
     setCategoryDialogOpen(true);
   };
+
+  // Realtime subscription for live category updates
+  useEffect(() => {
+    const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+    const categoriesCollectionId = import.meta.env.VITE_APPWRITE_COLLECTION_CATEGORIES;
+
+    if (!databaseId || !categoriesCollectionId) {
+      console.error('Missing database or collection configuration');
+      return;
+    }
+
+    const unsubscribe = createRealtimeSubscription(
+      buildChannels.categoryEvents(databaseId, categoriesCollectionId),
+      (response) => {
+        console.log('Realtime event on Categories page:', response);
+        queryClient.invalidateQueries({ queryKey: ['categories'] });
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient]);
 
   const handleEditCategory = (category: Category) => {
     setSelectedCategory(category);
