@@ -71,9 +71,9 @@ def generate_html_email(user_name, transactions, income, expense, balance):
 def main(context):
     """Weekly email report function"""
     client = Client()
-    client.set_endpoint(os.environ.get("APPWRITE_ENDPOINT"))
-    client.set_project(os.environ.get("APPWRITE_PROJECT_ID"))
-    client.set_key(context.req.headers.get("x-appwrite-key"))
+    client.set_endpoint(os.environ.get("APPWRITE_FUNCTION_API_ENDPOINT", os.environ.get("APPWRITE_ENDPOINT")))
+    client.set_project(os.environ.get("APPWRITE_FUNCTION_PROJECT_ID", os.environ.get("APPWRITE_PROJECT_ID")))
+    client.set_key(os.environ.get("APPWRITE_API_KEY", ""))
     
     databases = Databases(client)
     messaging = Messaging(client)
