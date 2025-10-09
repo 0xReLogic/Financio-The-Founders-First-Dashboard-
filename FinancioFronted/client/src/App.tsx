@@ -6,8 +6,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Bell, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuthStore } from '@/lib/authStore';
 import Dashboard from '@/pages/Dashboard';
@@ -41,12 +39,6 @@ function AuthenticatedLayout({ children }: Readonly<{ children: React.ReactNode 
               <SidebarTrigger data-testid="button-sidebar-toggle" />
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" data-testid="button-notifications">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon" data-testid="button-profile">
-                <User className="w-5 h-5" />
-              </Button>
               <ThemeToggle />
             </div>
           </header>

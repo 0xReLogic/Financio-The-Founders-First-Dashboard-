@@ -104,10 +104,9 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 mt-6">
@@ -214,49 +213,6 @@ export default function Settings() {
                   }
                   data-testid="switch-email"
                 />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
-                <Select
-                  value={prefs.theme}
-                  onValueChange={(value) => setPrefs({ ...prefs, theme: value })}
-                >
-                  <SelectTrigger id="theme" data-testid="select-theme">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="accent-color">Accent Color</Label>
-                <Select
-                  value={prefs.accentColor}
-                  onValueChange={(value) => setPrefs({ ...prefs, accentColor: value })}
-                >
-                  <SelectTrigger id="accent-color" data-testid="select-accent">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="green">Green (Default)</SelectItem>
-                    <SelectItem value="blue">Blue</SelectItem>
-                    <SelectItem value="purple">Purple</SelectItem>
-                    <SelectItem value="orange">Orange</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
           </Card>

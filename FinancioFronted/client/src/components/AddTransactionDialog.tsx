@@ -173,7 +173,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
             <Input
               id="amount"
               type="text"
-              placeholder="1.200.000"
+              placeholder="500"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               data-testid="input-amount"
@@ -209,12 +209,16 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Supplier invoice for..."
+              placeholder="e.g. Office supplies, Client payment, Marketing expense..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               data-testid="input-description"
+              rows={3}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Detailed descriptions help AI provide better financial insights
+            </p>
           </div>
 
           <div className="space-y-2">

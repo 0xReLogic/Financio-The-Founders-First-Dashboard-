@@ -65,9 +65,11 @@ export default function Login() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4 pb-8">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-md bg-primary flex items-center justify-center">
-              <Leaf className="w-10 h-10 text-primary-foreground" />
-            </div>
+            <Link href="/">
+              <div className="w-16 h-16 rounded-md bg-primary flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity">
+                <Leaf className="w-10 h-10 text-primary-foreground" />
+              </div>
+            </Link>
           </div>
           <div>
             <h1 className="text-3xl font-bold" data-testid="text-page-title">
