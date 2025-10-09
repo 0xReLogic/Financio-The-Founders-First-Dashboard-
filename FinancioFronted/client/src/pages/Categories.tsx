@@ -19,7 +19,7 @@ import EmptyState from '@/components/EmptyState';
 import { useToast } from '@/hooks/use-toast';
 import { categoryService, transactionService, type Category } from '@/lib/databaseService';
 import { createRealtimeSubscription, buildChannels } from '@/lib/realtimeService';
-import { formatCurrency } from '@/lib/mockData';
+import { formatCurrency } from '@/lib/formatters';
 
 export default function Categories() {
   const { toast } = useToast();

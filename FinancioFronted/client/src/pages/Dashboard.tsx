@@ -7,7 +7,7 @@ import AIAdvisorCard from '@/components/AIAdvisorCard';
 import TransactionItem from '@/components/TransactionItem';
 import AddTransactionDialog from '@/components/AddTransactionDialog';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/mockData';
+import { formatCurrency } from '@/lib/formatters';
 import { transactionService, categoryService } from '@/lib/databaseService';
 import { createRealtimeSubscription, buildChannels, isEventType } from '@/lib/realtimeService';
 import type { Transaction as UITransaction } from '@shared/types';

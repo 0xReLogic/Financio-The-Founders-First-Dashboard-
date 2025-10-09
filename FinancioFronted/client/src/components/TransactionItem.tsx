@@ -3,7 +3,7 @@ import { FileText, Pencil, Trash2, ArrowDownLeft, ArrowUpRight } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Transaction } from '@shared/types';
-import { formatCurrency, formatDate } from '@/lib/mockData';
+import { formatCurrency, formatDate } from '@/lib/formatters';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import { storageService } from '@/lib/databaseService';
