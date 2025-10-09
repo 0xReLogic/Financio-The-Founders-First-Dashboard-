@@ -83,13 +83,21 @@ def main(context):
         # Get all users
         users = users_service.list()
         
+        sent_count = 0
+        
         # Process each user
         for user in users.get("users", []):
             user_id = user.get("$id")
             user_name = user.get("name", "User")
             user_email = user.get("email")
+            user_prefs = user.get("prefs", {})
             
             if not user_email:
+                continue
+            
+            # Check if user has email notifications enabled (default: True for backward compatibility)
+            if not user_prefs.get("emailNotifications", True):
+                context.log(f"Skipping {user_email} - email notifications disabled")
                 continue
             
             # Get user's transactions from last 7 days

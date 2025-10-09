@@ -29,7 +29,7 @@ export default function StatsCard({
                 data-testid={`text-trend-${label.toLowerCase()}`}
               >
                 {trend >= 0 ? '+' : ''}
-                {trend}% dari bulan lalu
+                {trend}% from last month
               </p>
             )}
           </div>

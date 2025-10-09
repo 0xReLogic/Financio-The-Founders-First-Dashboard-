@@ -77,7 +77,7 @@ export default function Landing() {
             <div className="space-y-6">
               <div className="inline-block">
                 <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20">
-                  Trusted by 1000+ Indonesian SMEs
+                  For SMEs & Startups Worldwide
                 </span>
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
@@ -104,7 +104,7 @@ export default function Landing() {
               <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>30-day free trial</span>
+                  <span>Free forever</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -182,7 +182,7 @@ export default function Landing() {
           Ready for Healthier Business Finances?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of founders and SMEs who have switched from Excel to Financio
+            Start managing your finances smarter with AI-powered insights
           </p>
           <Link href="/register">
             <Button size="lg" data-testid="button-final-cta">

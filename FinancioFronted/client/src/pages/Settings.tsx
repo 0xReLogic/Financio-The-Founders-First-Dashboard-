@@ -128,20 +128,16 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="business-type">Business Type</Label>
-                <Select
-                  value={prefs.businessType}
-                  onValueChange={(value) => setPrefs({ ...prefs, businessType: value })}
-                >
-                  <SelectTrigger id="business-type" data-testid="select-business-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="food">Food & Beverage</SelectItem>
-                    <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="service">Services</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="business-type"
+                  placeholder="e.g. E-commerce, SaaS, Consulting"
+                  value={prefs.businessType || ''}
+                  onChange={(e) => setPrefs({ ...prefs, businessType: e.target.value })}
+                  data-testid="input-business-type"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This helps our AI provide more relevant financial advice
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="owner-name">Owner Name</Label>
@@ -205,9 +201,9 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
+                  <Label htmlFor="email-notifications">Weekly Email Reports</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive updates via email
+                    Receive weekly financial summary via email every Monday
                   </p>
                 </div>
                 <Switch
@@ -217,36 +213,6 @@ export default function Settings() {
                     setPrefs({ ...prefs, emailNotifications: checked })
                   }
                   data-testid="switch-email"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="transaction-alerts">Transaction Alerts</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifications for large transactions
-                  </p>
-                </div>
-                <Switch
-                  id="transaction-alerts"
-                  checked={prefs.transactionAlerts}
-                  onCheckedChange={(checked) =>
-                    setPrefs({ ...prefs, transactionAlerts: checked })
-                  }
-                  data-testid="switch-transaction-alerts"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="ai-insights">AI Insights</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Automatic recommendations from AI
-                  </p>
-                </div>
-                <Switch
-                  id="ai-insights"
-                  checked={prefs.aiInsights}
-                  onCheckedChange={(checked) => setPrefs({ ...prefs, aiInsights: checked })}
-                  data-testid="switch-ai-insights"
                 />
               </div>
             </CardContent>
