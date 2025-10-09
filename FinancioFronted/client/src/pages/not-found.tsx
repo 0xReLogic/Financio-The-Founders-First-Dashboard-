@@ -15,11 +15,11 @@ export default function NotFound() {
           </div>
 
           <h1 className="text-6xl font-bold text-destructive mb-2">404</h1>
-          <h2 className="text-2xl font-semibold mb-3">Halaman Tidak Ditemukan</h2>
+          <h2 className="text-2xl font-semibold mb-3">Page Not Found</h2>
           
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Maaf, halaman yang Anda cari tidak ada atau telah dipindahkan. 
-            Silakan periksa kembali URL atau kembali ke dashboard.
+            Sorry, the page you are looking for does not exist or has been moved. 
+            Please check the URL or return to the dashboard.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -29,14 +29,14 @@ export default function NotFound() {
               className="gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Kembali
+              Go Back
             </Button>
             <Button
               onClick={() => setLocation('/dashboard')}
               className="gap-2"
             >
               <Home className="w-4 h-4" />
-              Ke Dashboard
+              To Dashboard
             </Button>
           </div>
         </CardContent>

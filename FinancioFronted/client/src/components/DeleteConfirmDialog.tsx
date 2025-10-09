@@ -21,8 +21,8 @@ export default function DeleteConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = 'Hapus Transaksi?',
-  description = 'Tindakan ini tidak dapat dibatalkan. Transaksi akan dihapus secara permanen.',
+  title = 'Delete Item?',
+  description = 'This action cannot be undone. This will permanently delete the item.',
 }: DeleteConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -32,13 +32,13 @@ export default function DeleteConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel data-testid="button-cancel">Batal</AlertDialogCancel>
+          <AlertDialogCancel data-testid="button-cancel">Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             data-testid="button-confirm"
           >
-            Hapus
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

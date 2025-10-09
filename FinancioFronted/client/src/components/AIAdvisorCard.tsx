@@ -19,15 +19,15 @@ export default function AIAdvisorCard({ usageCount, usageLimit, onAnalyze }: AIA
               <h3 className="font-semibold text-lg">AI Financial Advisor</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-1">
-              Dapatkan insight bisnis instan dari AI kami
+              Get instant business insights from our AI
             </p>
             <p className="text-xs text-muted-foreground" data-testid="text-usage-count">
-              Penggunaan: {usageCount}/{usageLimit} bulan ini
+              Usage: {usageCount}/{usageLimit} this month
             </p>
           </div>
           <Button onClick={onAnalyze} size="lg" data-testid="button-get-advice">
             <Sparkles className="w-4 h-4 mr-2" />
-            Analisa Sekarang
+            Analyze Now
           </Button>
         </div>
       </CardContent>

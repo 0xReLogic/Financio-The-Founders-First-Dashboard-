@@ -81,7 +81,7 @@ export default function EditTransactionDialog({
           receiptId = uploadResult.$id;
         } catch (error) {
           console.error('Error handling receipt:', error);
-          throw new Error('Gagal mengupdate bukti transaksi');
+          throw new Error('Failed to update receipt');
         }
       }
       
@@ -90,8 +90,8 @@ export default function EditTransactionDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
-        title: 'Berhasil!',
-        description: 'Transaksi berhasil diupdate',
+        title: 'Success!',
+        description: 'Transaction updated successfully',
       });
       setReceiptFile(null);
       onOpenChange(false);
@@ -99,8 +99,8 @@ export default function EditTransactionDialog({
     onError: (error) => {
       console.error('Error updating transaction:', error);
       toast({
-        title: 'Gagal',
-        description: error instanceof Error ? error.message : 'Gagal mengupdate transaksi. Silakan coba lagi.',
+        title: 'Failed',
+        description: error instanceof Error ? error.message : 'Failed to update transaction. Please try again.',
         variant: 'destructive',
       });
     },
@@ -139,7 +139,7 @@ export default function EditTransactionDialog({
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       toast({
         title: 'Error',
-        description: 'Jumlah tidak valid',
+        description: 'Invalid amount',
         variant: 'destructive',
       });
       return;
@@ -163,23 +163,23 @@ export default function EditTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]" data-testid="dialog-edit-transaction">
         <DialogHeader>
-          <DialogTitle>Edit Transaksi</DialogTitle>
+          <DialogTitle>Edit Transaction</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Tipe</Label>
+            <Label>Type</Label>
             <RadioGroup value={type} onValueChange={(v) => setType(v as 'income' | 'expense')}>
               <div className="flex gap-4">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="income" id="edit-income" data-testid="radio-income" />
                   <Label htmlFor="edit-income" className="cursor-pointer">
-                    Pemasukan
+                    Income
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="expense" id="edit-expense" data-testid="radio-expense" />
                   <Label htmlFor="edit-expense" className="cursor-pointer">
-                    Pengeluaran
+                    Expense
                   </Label>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function EditTransactionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-amount">Jumlah</Label>
+            <Label htmlFor="edit-amount">Amount</Label>
             <Input
               id="edit-amount"
               type="text"
@@ -200,10 +200,10 @@ export default function EditTransactionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-category">Kategori</Label>
+            <Label htmlFor="edit-category">Category</Label>
             <Select value={category} onValueChange={setCategory} required>
               <SelectTrigger id="edit-category" data-testid="select-category">
-                <SelectValue placeholder="Pilih kategori" />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
                 {filteredCategories.map((cat) => (
@@ -216,10 +216,10 @@ export default function EditTransactionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Deskripsi</Label>
+            <Label htmlFor="edit-description">Description</Label>
             <Textarea
               id="edit-description"
-              placeholder="Supplier invoice untuk..."
+              placeholder="Supplier invoice for..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               data-testid="input-description"
@@ -228,7 +228,7 @@ export default function EditTransactionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-date">Tanggal</Label>
+            <Label htmlFor="edit-date">Date</Label>
             <Input
               id="edit-date"
               type="date"
@@ -240,7 +240,7 @@ export default function EditTransactionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Bukti Transaksi (Opsional)</Label>
+            <Label>Receipt (Optional)</Label>
             {currentReceiptId && !receiptFile && (
               <div className="text-sm text-muted-foreground mb-2">
                 <a 
@@ -249,7 +249,7 @@ export default function EditTransactionDialog({
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
                 >
-                  Lihat bukti saat ini
+                  View current receipt
                 </a>
               </div>
             )}
@@ -267,10 +267,10 @@ export default function EditTransactionDialog({
               onClick={() => onOpenChange(false)}
               data-testid="button-cancel"
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" data-testid="button-save">
-              Simpan Perubahan
+              Save Changes
             </Button>
           </div>
         </form>

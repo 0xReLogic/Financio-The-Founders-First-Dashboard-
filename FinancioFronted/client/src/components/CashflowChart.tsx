@@ -26,7 +26,7 @@ export default function CashflowChart() {
     // Group by date (DD MMM format)
     const groupedByDate = recentTransactions.reduce((acc, t) => {
       const date = new Date(t.date);
-      const key = `${date.getDate()} ${date.toLocaleDateString('id-ID', { month: 'short' })}`;
+      const key = `${date.getDate()} ${date.toLocaleDateString('en-US', { month: 'short' })}`;
       
       if (!acc[key]) {
         acc[key] = { day: key, income: 0, expense: 0, date: date.getTime() };
@@ -50,19 +50,19 @@ export default function CashflowChart() {
   return (
     <Card data-testid="card-cashflow-chart">
       <CardHeader>
-        <CardTitle className="text-lg">Cash Flow (30 Hari)</CardTitle>
+        <CardTitle className="text-lg">Cash Flow (Last 30 Days)</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center h-[300px]">
             <div className="text-center space-y-2">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-sm text-muted-foreground">Memuat data...</p>
+              <p className="text-sm text-muted-foreground">Loading data...</p>
             </div>
           </div>
         ) : chartData.length === 0 ? (
           <div className="flex items-center justify-center h-[300px]">
-            <p className="text-sm text-muted-foreground">Belum ada data transaksi dalam 30 hari terakhir</p>
+            <p className="text-sm text-muted-foreground">No transaction data in the last 30 days</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
@@ -76,7 +76,7 @@ export default function CashflowChart() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '6px',
                 }}
-                formatter={(value: number) => `Rp ${value.toLocaleString('id-ID')}`}
+                formatter={(value: number) => `${value.toLocaleString('en-US')}`}
               />
               <Line
                 type="monotone"
@@ -84,7 +84,7 @@ export default function CashflowChart() {
                 stroke="#65a30d"
                 strokeWidth={2}
                 dot={{ fill: '#65a30d' }}
-                name="Pemasukan"
+                name="Income"
               />
               <Line
                 type="monotone"
@@ -92,7 +92,7 @@ export default function CashflowChart() {
                 stroke="#dc2626"
                 strokeWidth={2}
                 dot={{ fill: '#dc2626' }}
-                name="Pengeluaran"
+                name="Expense"
               />
             </LineChart>
           </ResponsiveContainer>

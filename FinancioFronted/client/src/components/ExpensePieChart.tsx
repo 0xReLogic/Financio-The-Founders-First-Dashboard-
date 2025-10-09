@@ -50,19 +50,19 @@ export default function ExpensePieChart() {
   return (
     <Card data-testid="card-expense-pie-chart">
       <CardHeader>
-        <CardTitle className="text-lg">Pengeluaran per Kategori</CardTitle>
+        <CardTitle className="text-lg">Expense by Category</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center h-[300px]">
             <div className="text-center space-y-2">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-sm text-muted-foreground">Memuat data...</p>
+              <p className="text-sm text-muted-foreground">Loading data...</p>
             </div>
           </div>
         ) : chartData.length === 0 ? (
           <div className="flex items-center justify-center h-[300px]">
-            <p className="text-sm text-muted-foreground">Belum ada data pengeluaran</p>
+            <p className="text-sm text-muted-foreground">No expense data yet</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
@@ -85,7 +85,7 @@ export default function ExpensePieChart() {
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: number) => `Rp ${value.toLocaleString('id-ID')}`}
+                formatter={(value: number) => `${value.toLocaleString('en-US')}`}
               />
               <Legend />
             </PieChart>

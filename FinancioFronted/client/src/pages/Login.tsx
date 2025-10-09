@@ -85,7 +85,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="andi@warungkopi.com"
+                placeholder="founder@mycompany.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="input-email"
@@ -121,7 +121,7 @@ export default function Login() {
             <div className="flex justify-end">
               <Link href="/forgot-password">
                 <a className="text-sm text-primary hover:underline" data-testid="link-forgot-password">
-                  Lupa Password?
+                  Forgot Password?
                 </a>
               </Link>
             </div>
@@ -137,7 +137,7 @@ export default function Login() {
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Belum punya akun?{' '}
+            Don't have an account?{' '}
             <Link href="/register">
               <a className="text-primary hover:underline font-semibold" data-testid="link-register">
                 Sign Up

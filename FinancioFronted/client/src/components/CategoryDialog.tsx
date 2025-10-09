@@ -79,8 +79,8 @@ export default function CategoryDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
-        title: 'Kategori ditambahkan',
-        description: `${name} berhasil ditambahkan`,
+        title: 'Category Added',
+        description: `${name} has been added successfully`,
       });
       onOpenChange(false);
     },
@@ -88,7 +88,7 @@ export default function CategoryDialog({
       console.error('Create category error:', error);
       toast({
         title: 'Error',
-        description: 'Gagal menambahkan kategori. Silakan coba lagi.',
+        description: 'Failed to add category. Please try again.',
         variant: 'destructive',
       });
     },
@@ -101,8 +101,8 @@ export default function CategoryDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
-        title: 'Kategori diperbarui',
-        description: `${name} berhasil diperbarui`,
+        title: 'Category Updated',
+        description: `${name} has been updated successfully`,
       });
       onOpenChange(false);
     },
@@ -110,7 +110,7 @@ export default function CategoryDialog({
       console.error('Update category error:', error);
       toast({
         title: 'Error',
-        description: 'Gagal memperbarui kategori. Silakan coba lagi.',
+        description: 'Failed to update category. Please try again.',
         variant: 'destructive',
       });
     },
@@ -125,7 +125,7 @@ export default function CategoryDialog({
     if (!name.trim()) {
       toast({
         title: 'Error',
-        description: 'Nama kategori tidak boleh kosong',
+        description: 'Category name cannot be empty',
         variant: 'destructive',
       });
       return;
@@ -160,16 +160,16 @@ export default function CategoryDialog({
       }}>
         <DialogHeader>
           <DialogTitle>
-            {category ? 'Edit Kategori' : 'Tambah Kategori'}
+            {category ? 'Edit Category' : 'Add Category'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Kategori</Label>
+            <Label htmlFor="name">Category Name</Label>
             <Input
               id="name"
-              placeholder="Contoh: Marketing, Gaji, dll"
+              placeholder="e.g., Marketing, Salary, etc."
               value={name}
               onChange={(e) => setName(e.target.value)}
               data-testid="input-category-name"
@@ -177,20 +177,20 @@ export default function CategoryDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Tipe</Label>
+            <Label htmlFor="type">Type</Label>
             <Select value={type} onValueChange={(v) => setType(v as any)}>
               <SelectTrigger id="type" data-testid="select-category-type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="income">Pemasukan</SelectItem>
-                <SelectItem value="expense">Pengeluaran</SelectItem>
+                <SelectItem value="income">Income</SelectItem>
+                <SelectItem value="expense">Expense</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Warna</Label>
+            <Label>Color</Label>
             <div className="grid grid-cols-5 gap-2">
               {PRESET_COLORS.map((color) => (
                 <button
@@ -225,9 +225,9 @@ export default function CategoryDialog({
               style={{ backgroundColor: selectedColor }}
             />
             <div>
-              <p className="text-sm font-medium">{name || 'Nama Kategori'}</p>
+              <p className="text-sm font-medium">{name || 'Category Name'}</p>
               <p className="text-xs text-muted-foreground">
-                {type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                {type === 'income' ? 'Income' : 'Expense'}
               </p>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function CategoryDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={createMutation.isPending || updateMutation.isPending}>
-            Batal
+            Cancel
           </Button>
           <Button 
             onClick={handleSubmit} 
@@ -243,8 +243,8 @@ export default function CategoryDialog({
             disabled={createMutation.isPending || updateMutation.isPending}
           >
             {createMutation.isPending || updateMutation.isPending 
-              ? 'Menyimpan...' 
-              : category ? 'Simpan Perubahan' : 'Tambah Kategori'}
+              ? 'Saving...' 
+              : category ? 'Save Changes' : 'Add Category'}
           </Button>
         </DialogFooter>
       </DialogContent>

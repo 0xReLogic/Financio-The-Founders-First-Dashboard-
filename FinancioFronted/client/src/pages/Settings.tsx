@@ -78,13 +78,13 @@ export default function Settings() {
       }
 
       toast({
-        title: '✅ Pengaturan disimpan',
-        description: 'Perubahan Anda telah berhasil disimpan',
+        title: '✅ Settings Saved',
+        description: 'Your changes have been saved successfully',
       });
     } catch (error: any) {
       toast({
-        title: '❌ Gagal menyimpan',
-        description: error.message || 'Terjadi kesalahan saat menyimpan pengaturan',
+        title: '❌ Save Failed',
+        description: error.message || 'An error occurred while saving settings',
         variant: 'destructive',
       });
     } finally {
@@ -96,38 +96,38 @@ export default function Settings() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold" data-testid="text-page-title">
-          Pengaturan
+          Settings
         </h1>
         <p className="text-muted-foreground mt-1">
-          Kelola preferensi dan informasi bisnis Anda
+          Manage your preferences and business information
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="notifications">Notifikasi</TabsTrigger>
-          <TabsTrigger value="appearance">Tampilan</TabsTrigger>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profil Bisnis</CardTitle>
+              <CardTitle>Business Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="business-name">Nama Bisnis</Label>
+                <Label htmlFor="business-name">Business Name</Label>
                 <Input
                   id="business-name"
-                  placeholder="Warung Kopi Pak Andi"
+                  placeholder="e.g. John's Coffee Shop"
                   value={prefs.businessName || ''}
                   onChange={(e) => setPrefs({ ...prefs, businessName: e.target.value })}
                   data-testid="input-business-name"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="business-type">Jenis Bisnis</Label>
+                <Label htmlFor="business-type">Business Type</Label>
                 <Select
                   value={prefs.businessType}
                   onValueChange={(value) => setPrefs({ ...prefs, businessType: value })}
@@ -136,18 +136,18 @@ export default function Settings() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="food">Makanan & Minuman</SelectItem>
+                    <SelectItem value="food">Food & Beverage</SelectItem>
                     <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="service">Jasa</SelectItem>
-                    <SelectItem value="other">Lainnya</SelectItem>
+                    <SelectItem value="service">Services</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="owner-name">Nama Pemilik</Label>
+                <Label htmlFor="owner-name">Owner Name</Label>
                 <Input
                   id="owner-name"
-                  placeholder="Pak Andi"
+                  placeholder="e.g. John Doe"
                   value={prefs.ownerName || ''}
                   onChange={(e) => setPrefs({ ...prefs, ownerName: e.target.value })}
                   data-testid="input-owner-name"
@@ -158,11 +158,11 @@ export default function Settings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Preferensi</CardTitle>
+              <CardTitle>Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currency">Mata Uang</Label>
+                <Label htmlFor="currency">Currency</Label>
                 <Select
                   value={prefs.currency}
                   onValueChange={(value) => setPrefs({ ...prefs, currency: value })}
@@ -171,14 +171,14 @@ export default function Settings() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="idr">Rupiah (IDR)</SelectItem>
+                    <SelectItem value="idr">Indonesian Rupiah (IDR)</SelectItem>
                     <SelectItem value="usd">US Dollar (USD)</SelectItem>
                     <SelectItem value="eur">Euro (EUR)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="date-format">Format Tanggal</Label>
+                <Label htmlFor="date-format">Date Format</Label>
                 <Select
                   value={prefs.dateFormat}
                   onValueChange={(value) => setPrefs({ ...prefs, dateFormat: value })}
@@ -200,14 +200,14 @@ export default function Settings() {
         <TabsContent value="notifications" className="space-y-4 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notifikasi</CardTitle>
+              <CardTitle>Notifications</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="email-notifications">Notifikasi Email</Label>
+                  <Label htmlFor="email-notifications">Email Notifications</Label>
                   <p className="text-sm text-muted-foreground">
-                    Terima update via email
+                    Receive updates via email
                   </p>
                 </div>
                 <Switch
@@ -221,9 +221,9 @@ export default function Settings() {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="transaction-alerts">Alert Transaksi</Label>
+                  <Label htmlFor="transaction-alerts">Transaction Alerts</Label>
                   <p className="text-sm text-muted-foreground">
-                    Notifikasi untuk transaksi besar
+                    Notifications for large transactions
                   </p>
                 </div>
                 <Switch
@@ -239,7 +239,7 @@ export default function Settings() {
                 <div>
                   <Label htmlFor="ai-insights">AI Insights</Label>
                   <p className="text-sm text-muted-foreground">
-                    Rekomendasi otomatis dari AI
+                    Automatic recommendations from AI
                   </p>
                 </div>
                 <Switch
@@ -256,11 +256,11 @@ export default function Settings() {
         <TabsContent value="appearance" className="space-y-4 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tampilan</CardTitle>
+              <CardTitle>Appearance</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="theme">Tema</Label>
+                <Label htmlFor="theme">Theme</Label>
                 <Select
                   value={prefs.theme}
                   onValueChange={(value) => setPrefs({ ...prefs, theme: value })}
@@ -276,7 +276,7 @@ export default function Settings() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="accent-color">Warna Aksen</Label>
+                <Label htmlFor="accent-color">Accent Color</Label>
                 <Select
                   value={prefs.accentColor}
                   onValueChange={(value) => setPrefs({ ...prefs, accentColor: value })}
@@ -299,10 +299,10 @@ export default function Settings() {
 
       <div className="flex justify-end gap-2">
         <Button variant="outline" data-testid="button-cancel">
-          Batal
+          Cancel
         </Button>
         <Button onClick={handleSave} disabled={loading} data-testid="button-save">
-          {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+          {loading ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
     </div>

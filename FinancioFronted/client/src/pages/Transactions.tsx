@@ -46,15 +46,15 @@ export default function Transactions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
-        title: 'Berhasil!',
-        description: 'Transaksi berhasil dihapus',
+        title: 'Success!',
+        description: 'Transaction deleted successfully',
       });
     },
     onError: (error) => {
       console.error('Error deleting transaction:', error);
       toast({
-        title: 'Gagal',
-        description: 'Gagal menghapus transaksi. Silakan coba lagi.',
+        title: 'Failed',
+        description: 'Failed to delete transaction. Please try again.',
         variant: 'destructive',
       });
     },
@@ -133,10 +133,10 @@ export default function Transactions() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold" data-testid="text-page-title">
-            Transaksi
+            Transactions
           </h1>
           <p className="text-muted-foreground mt-1">
-            Kelola semua transaksi keuangan Anda
+            Manage all your financial transactions
           </p>
         </div>
         <AddTransactionDialog />
@@ -147,7 +147,7 @@ export default function Transactions() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Cari transaksi..."
+              placeholder="Search transactions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -163,20 +163,20 @@ export default function Transactions() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-full sm:w-[180px]" data-testid="select-type">
-              <SelectValue placeholder="Semua Tipe" />
+              <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tipe</SelectItem>
-              <SelectItem value="income">Pemasukan</SelectItem>
-              <SelectItem value="expense">Pengeluaran</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="income">Income</SelectItem>
+              <SelectItem value="expense">Expense</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-full sm:w-[180px]" data-testid="select-category">
-              <SelectValue placeholder="Semua Kategori" />
+              <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Kategori</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.$id || cat.name} value={cat.$id || ''}>
                   {cat.name}
@@ -191,19 +191,19 @@ export default function Transactions() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center space-y-2">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-muted-foreground">Memuat transaksi...</p>
+            <p className="text-sm text-muted-foreground">Loading transactions...</p>
           </div>
         </div>
       ) : filteredTransactions.length === 0 ? (
         <EmptyState
           icon={Receipt}
-          title="Belum Ada Transaksi"
+          title="No Transactions Yet"
           description={
             searchQuery || filterType !== 'all' || filterCategory !== 'all' || dateRange?.from
-              ? 'Tidak ada transaksi yang sesuai dengan filter Anda. Coba ubah kriteria pencarian.'
-              : 'Belum ada transaksi yang tercatat. Mulai kelola keuangan Anda dengan menambahkan transaksi pertama.'
+              ? 'No transactions match your filters. Try changing your search criteria.'
+              : 'No transactions have been recorded yet. Start managing your finances by adding your first transaction.'
           }
-          actionLabel="Tambah Transaksi"
+          actionLabel="Add Transaction"
           onAction={() => setIsAddDialogOpen(true)}
         />
       ) : (
@@ -221,11 +221,11 @@ export default function Transactions() {
 
           <div className="flex items-center justify-center gap-2">
             <Button variant="outline" size="sm" disabled data-testid="button-previous">
-              Sebelumnya
+              Previous
             </Button>
-            <span className="text-sm text-muted-foreground">Halaman 1 dari 1</span>
+            <span className="text-sm text-muted-foreground">Page 1 of 1</span>
             <Button variant="outline" size="sm" disabled data-testid="button-next">
-              Selanjutnya
+              Next
             </Button>
           </div>
         </>

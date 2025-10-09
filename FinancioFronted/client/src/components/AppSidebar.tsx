@@ -22,12 +22,12 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Transaksi',
+    title: 'Transactions',
     url: '/transactions',
     icon: Receipt,
   },
   {
-    title: 'Kategori',
+    title: 'Categories',
     url: '/categories',
     icon: FolderOpen,
   },
@@ -37,7 +37,7 @@ const menuItems = [
     icon: Sparkles,
   },
   {
-    title: 'Pengaturan',
+    title: 'Settings',
     url: '/settings',
     icon: Settings,
   },
@@ -73,7 +73,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
+          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (

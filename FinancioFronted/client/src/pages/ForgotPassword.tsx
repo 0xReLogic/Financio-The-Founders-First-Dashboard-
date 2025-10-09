@@ -49,12 +49,12 @@ export default function ForgotPassword() {
           </div>
           <div>
             <h1 className="text-3xl font-bold" data-testid="text-page-title">
-              Lupa Password?
+              Forgot Password?
             </h1>
             <p className="text-muted-foreground mt-2">
               {submitted
-                ? 'Cek email Anda untuk reset password'
-                : 'Masukkan email Anda untuk reset password'}
+                ? 'Check your email to reset your password'
+                : 'Enter your email to reset your password'}
             </p>
           </div>
         </CardHeader>
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="andi@warungkopi.com"
+                  placeholder="founder@mycompany.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   data-testid="input-email"
@@ -80,7 +80,7 @@ export default function ForgotPassword() {
                     Sending...
                   </>
                 ) : (
-                  'Kirim Link Reset'
+                  'Send Reset Link'
                 )}
               </Button>
             </form>
@@ -88,13 +88,13 @@ export default function ForgotPassword() {
             <div className="space-y-4">
               <div className="p-4 bg-primary/10 border border-primary/20 rounded-md text-center" data-testid="text-success-message">
                 <p className="text-sm">
-                  Kami sudah mengirimkan link reset password ke <strong>{email}</strong>
+                  We have sent a password reset link to <strong>{email}</strong>
                 </p>
               </div>
               <Link href="/login">
                 <Button variant="outline" className="w-full" data-testid="button-back-to-login">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Kembali ke Login
+                  Back to Login
                 </Button>
               </Link>
             </div>
@@ -105,7 +105,7 @@ export default function ForgotPassword() {
               <Link href="/login">
                 <Button variant="ghost" className="w-full" data-testid="link-back">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Kembali ke Login
+                  Back to Login
                 </Button>
               </Link>
             </div>

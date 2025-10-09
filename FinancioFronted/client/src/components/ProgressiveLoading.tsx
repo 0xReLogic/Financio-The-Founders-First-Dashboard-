@@ -12,22 +12,22 @@ interface ProgressiveLoadingProps {
 const steps = [
   {
     icon: Database,
-    label: 'Mengumpulkan data transaksi...',
+    label: 'Gathering transaction data...',
     color: 'text-blue-500',
   },
   {
     icon: Calculator,
-    label: 'Menghitung pola keuangan...',
+    label: 'Calculating financial patterns...',
     color: 'text-yellow-500',
   },
   {
     icon: Sparkles,
-    label: 'Menganalisa dengan AI...',
+    label: 'Analyzing with AI...',
     color: 'text-purple-500',
   },
   {
     icon: CheckCircle2,
-    label: 'Analisa selesai!',
+    label: 'Analysis complete!',
     color: 'text-[#65a30d]',
   },
 ];
@@ -139,7 +139,7 @@ export default function ProgressiveLoading({
           <div className="space-y-2">
             <Progress value={progress} className="h-2" />
             <p className="text-xs text-center text-muted-foreground">
-              {Math.round(progress)}% selesai
+              {Math.round(progress)}% complete
             </p>
           </div>
         </div>

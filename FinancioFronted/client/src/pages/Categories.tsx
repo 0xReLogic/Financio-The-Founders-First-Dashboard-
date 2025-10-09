@@ -124,15 +124,15 @@ export default function Categories() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold" data-testid="text-page-title">
-            Kategori
+            Categories
           </h1>
           <p className="text-muted-foreground mt-1">
-            Kelola kategori transaksi Anda
+            Manage your transaction categories
           </p>
         </div>
         <Button onClick={handleAddCategory} data-testid="button-add-category">
           <Plus className="w-4 h-4 mr-2" />
-          Tambah Kategori
+          Add Category
         </Button>
       </div>
 
@@ -145,9 +145,9 @@ export default function Categories() {
           <div className="col-span-full">
             <EmptyState
               icon={FolderOpen}
-              title="Belum Ada Kategori"
-              description="Buat kategori untuk mengorganisir transaksi Anda dengan lebih baik."
-              actionLabel="Tambah Kategori"
+              title="No Categories Yet"
+              description="Create categories to better organize your transactions."
+              actionLabel="Add Category"
               onAction={handleAddCategory}
             />
           </div>
@@ -193,12 +193,12 @@ export default function Categories() {
                   <h3 className="font-semibold text-lg mb-2">{category.name}</h3>
                   <div className="flex items-center gap-2 mb-3">
                     <Badge variant={category.type === 'income' ? 'default' : 'secondary'}>
-                      {category.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                      {category.type === 'income' ? 'Income' : 'Expense'}
                     </Badge>
                   </div>
                   <div className="pt-3 border-t space-y-1">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Transaksi</span>
+                      <span className="text-muted-foreground">Transactions</span>
                       <span className="font-medium">{stats.count}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
@@ -224,16 +224,16 @@ export default function Categories() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Kategori?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Category?</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus kategori "{categoryToDelete?.name}"?
-              Tindakan ini tidak dapat dibatalkan.
+              Are you sure you want to delete the category "{categoryToDelete?.name}"?
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm}>
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

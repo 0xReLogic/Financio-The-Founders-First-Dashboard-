@@ -58,8 +58,8 @@ export default function TransactionItem({
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onConfirm={handleDelete}
-        title="Hapus Transaksi?"
-        description={`Apakah Anda yakin ingin menghapus transaksi "${transaction.description}"? Tindakan ini tidak dapat dibatalkan.`}
+        title="Delete Transaction?"
+        description={`Are you sure you want to delete the transaction "${transaction.description}"? This action cannot be undone.`}
       />
     
     <div
@@ -105,7 +105,7 @@ export default function TransactionItem({
                 size="icon"
                 variant="ghost"
                 onClick={handleViewReceipt}
-                title="Lihat Bukti Transaksi"
+                title="View Receipt"
                 data-testid={`button-view-receipt-${transaction.id}`}
               >
                 <FileText className="w-4 h-4" />

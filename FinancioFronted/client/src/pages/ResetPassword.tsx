@@ -109,7 +109,7 @@ export default function ResetPassword() {
                 <Input
                   id="newPassword"
                   type="password"
-                  placeholder="Minimal 8 karakter"
+                  placeholder="At least 8 characters"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -123,7 +123,7 @@ export default function ResetPassword() {
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Ketik ulang password"
+                  placeholder="Re-type your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

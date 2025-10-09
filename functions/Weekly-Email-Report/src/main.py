@@ -33,34 +33,34 @@ def generate_html_email(user_name, transactions, income, expense, balance):
     <body>
         <div class="container">
             <div class="header">
-                <h1>📊 Laporan Keuangan Mingguan</h1>
-                <p>Halo {user_name},</p>
-                <p>Berikut ringkasan keuangan Anda minggu ini</p>
+                <h1>📊 Weekly Financial Report</h1>
+                <p>Hello {user_name},</p>
+                <p>Here is your financial summary for this week</p>
             </div>
             
             <div class="stats">
                 <div class="stat-card">
-                    <div class="stat-value">Rp {income:,}</div>
-                    <div class="stat-label">Total Pemasukan</div>
+                    <div class="stat-value">${income:,}</div>
+                    <div class="stat-label">Total Income</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">Rp {expense:,}</div>
-                    <div class="stat-label">Total Pengeluaran</div>
+                    <div class="stat-value">${expense:,}</div>
+                    <div class="stat-label">Total Expense</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">Rp {balance:,}</div>
-                    <div class="stat-label">Saldo Bersih</div>
+                    <div class="stat-value">${balance:,}</div>
+                    <div class="stat-label">Net Balance</div>
                 </div>
             </div>
             
-            <h3>Transaksi Terbaru ({len(transactions)} transaksi)</h3>
+            <h3>Recent Transactions ({len(transactions)} transactions)</h3>
             <div class="transactions">
                 {''.join([f'<div class="transaction">{t}</div>' for t in transactions[:5]])}
             </div>
             
             <div class="footer">
-                <p>Email ini dikirim otomatis oleh Financio</p>
-                <p><a href="https://financio.app">Buka Dashboard</a></p>
+                <p>This email was sent automatically by Financio</p>
+                <p><a href="https://financio.app">Open Dashboard</a></p>
             </div>
         </div>
     </body>
@@ -113,7 +113,7 @@ def main(context):
             html_content = generate_html_email(
                 user_name=user_name,
                 transactions=[
-                    f"{t['description']} - Rp {t['amount']:,}" 
+                    f"{t['description']} - ${t['amount']:,}" 
                     for t in transactions.get("documents", [])
                 ],
                 income=income,
@@ -124,7 +124,7 @@ def main(context):
             # Send email via Messaging API
             messaging.create_email(
                 message_id=ID.unique(),
-                subject=f"📊 Laporan Keuangan Mingguan - {datetime.now().strftime('%d %B %Y')}",
+                subject=f"📊 Weekly Financial Report - {datetime.now().strftime('%B %d, %Y')}",
                 content=html_content,
                 users=[user_id],  # Send to specific user
                 html=True,

@@ -51,7 +51,7 @@ def check_rate_limit(databases, user_id):
                 "totalCredits": total_credits,
                 "usedCredits": used_credits,
                 "remainingCredits": 0,
-                "message": "Upgrade to premium untuk mendapatkan 50 credits tambahan!"
+                "message": "Upgrade to premium to get 50 additional credits!"
             }
         
         # Deduct 1 credit
@@ -148,28 +148,28 @@ def generate_ai_advice(analysis_data, transactions):
         
         # Build prompt
         prompt = f"""
-You are a financial advisor for UMKM (Small and Medium Enterprises) in Indonesia. 
-Analyze the following financial data and provide actionable advice in Indonesian language.
+You are a financial advisor for Small and Medium Enterprises (SMEs). 
+Analyze the following financial data and provide actionable advice in English.
 
 **Financial Summary (Last 30 Days):**
-- Total Income: Rp {analysis_data['total_income']:,.0f}
-- Total Expense: Rp {analysis_data['total_expense']:,.0f}
-- Net Balance: Rp {analysis_data['net_balance']:,.0f}
+- Total Income: ${analysis_data['total_income']:,.0f}
+- Total Expense: ${analysis_data['total_expense']:,.0f}
+- Net Balance: ${analysis_data['net_balance']:,.0f}
 - Number of Transactions: {analysis_data['transaction_count']}
 
 **Expense Breakdown by Category:**
 """
         for category, amount in sorted(analysis_data['expense_by_category'].items(), key=lambda x: x[1], reverse=True):
             percentage = (amount / analysis_data['total_expense'] * 100) if analysis_data['total_expense'] > 0 else 0
-            prompt += f"\n- {category}: Rp {amount:,.0f} ({percentage:.1f}%)"
+            prompt += f"\n- {category}: ${amount:,.0f} ({percentage:.1f}%)"
         
         prompt += """
 
 **Please provide:**
-1. **Analisis Keuangan**: Berikan analisis singkat tentang kesehatan keuangan bisnis
-2. **Area Penghematan**: Identifikasi kategori pengeluaran yang bisa dioptimalkan
-3. **Rekomendasi**: Berikan 3-5 rekomendasi spesifik untuk meningkatkan cash flow
-4. **Peringatan**: Highlight masalah kritis jika ada (misal: pengeluaran > pendapatan)
+1. **Financial Analysis**: Provide a brief analysis of the business's financial health.
+2. **Areas for Savings**: Identify expense categories that can be optimized.
+3. **Recommendations**: Give 3-5 specific recommendations to improve cash flow.
+4. **Warnings**: Highlight any critical issues (e.g., expenses exceeding income).
 
 Format response dalam markdown dengan struktur yang jelas dan mudah dibaca.
 """

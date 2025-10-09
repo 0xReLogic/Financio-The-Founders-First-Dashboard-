@@ -30,7 +30,7 @@ export default function FileUploadPreview({
     // Validate file size
     const fileSizeMB = file.size / (1024 * 1024);
     if (fileSizeMB > maxSizeMB) {
-      setError(`Ukuran file maksimal ${maxSizeMB}MB`);
+      setError(`Maximum file size is ${maxSizeMB}MB`);
       handleClear();
       return;
     }
@@ -85,7 +85,7 @@ export default function FileUploadPreview({
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <Upload className="w-8 h-8" />
             <p className="text-sm font-medium">Upload Receipt</p>
-            <p className="text-xs">Klik untuk pilih file (Max {maxSizeMB}MB)</p>
+            <p className="text-xs">Click to select a file (Max {maxSizeMB}MB)</p>
           </div>
         </button>
       )}

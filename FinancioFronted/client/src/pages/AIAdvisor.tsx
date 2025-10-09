@@ -34,16 +34,16 @@ export default function AIAdvisor() {
       queryClient.invalidateQueries({ queryKey: ['ai-credits'] });
       queryClient.invalidateQueries({ queryKey: ['ai-analyses'] });
       toast({
-        title: 'Analisa Selesai!',
-        description: 'AI telah menganalisa kondisi keuangan Anda.',
+        title: 'Analysis Complete!',
+        description: 'The AI has analyzed your financial condition.',
       });
     },
     onError: (error: any) => {
       setIsAnalyzing(false);
-      const errorMessage = error.message || 'Gagal melakukan analisa';
+      const errorMessage = error.message || 'Failed to perform analysis';
       toast({
-        title: 'Analisa Gagal',
-        description: errorMessage,
+        title: 'Analysis Failed',
+        description: errorMessage, 
         variant: 'destructive',
       });
     },
@@ -52,8 +52,8 @@ export default function AIAdvisor() {
   const handleAnalyze = () => {
     if (!credits || credits.remainingCredits <= 0) {
       toast({
-        title: 'Credit Habis',
-        description: 'Anda tidak memiliki credit tersisa. Upgrade ke premium untuk mendapatkan 50 credit tambahan!',
+        title: 'Credits Depleted',
+        description: 'You have no credits left. Upgrade to premium to get 50 additional credits!',
         variant: 'destructive',
       });
       return;
@@ -66,13 +66,13 @@ export default function AIAdvisor() {
 
   const handleExportPDF = () => {
     toast({
-      title: 'Mengekspor PDF',
-      description: 'Laporan analisa sedang diunduh...',
+      title: 'Exporting PDF',
+      description: 'The analysis report is being downloaded...',
     });
     // TODO: Implement PDF export
     setTimeout(() => {
       toast({
-        title: 'PDF Berhasil Diunduh',
+        title: 'PDF Downloaded Successfully',
         description: 'financial-analysis-report.pdf',
       });
     }, 1500);
@@ -90,7 +90,7 @@ export default function AIAdvisor() {
           AI Financial Advisor
         </h1>
         <p className="text-muted-foreground mt-1">
-          Dapatkan insight komprehensif tentang kesehatan keuangan bisnis Anda
+          Get comprehensive insights into your business's financial health
         </p>
       </div>
 
@@ -98,7 +98,7 @@ export default function AIAdvisor() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center space-y-2">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-muted-foreground">Memuat data...</p>
+            <p className="text-sm text-muted-foreground">Loading data...</p>
           </div>
         </div>
       ) : !isAnalyzing && !analysisResult ? (
@@ -108,11 +108,11 @@ export default function AIAdvisor() {
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold mb-3">
-              Analisa Keuangan Komprehensif
+              Comprehensive Financial Analysis
             </h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              AI kami akan menganalisa 30 hari terakhir dari transaksi Anda dan
-              memberikan insight mendalam tentang kesehatan keuangan bisnis Anda.
+              Our AI will analyze the last 30 days of your transactions and
+              provide deep insights into your business's financial health.
             </p>
             <Button
               size="lg"
@@ -121,10 +121,10 @@ export default function AIAdvisor() {
               disabled={!credits || credits.remainingCredits <= 0}
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Mulai Analisa
+              Start Analysis
             </Button>
             <p className="text-sm text-muted-foreground mt-4" data-testid="text-usage">
-              Credit tersisa: {credits?.remainingCredits || 0}/{credits?.totalCredits || 10}
+              Credits remaining: {credits?.remainingCredits || 0}/{credits?.totalCredits || 10}
               {credits?.isPaid && <span className="ml-2 text-primary">(Premium)</span>}
             </p>
           </CardContent>
@@ -141,27 +141,27 @@ export default function AIAdvisor() {
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Pendapatan</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Income</CardTitle>
                 <TrendingUp className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  Rp {summary.total_income?.toLocaleString('id-ID') || 0}
+                  ${summary.total_income?.toLocaleString('en-US') || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">30 hari terakhir</p>
+                <p className="text-xs text-muted-foreground">last 30 days</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Pengeluaran</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Expense</CardTitle>
                 <TrendingDown className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  Rp {summary.total_expense?.toLocaleString('id-ID') || 0}
+                  ${summary.total_expense?.toLocaleString('en-US') || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">30 hari terakhir</p>
+                <p className="text-xs text-muted-foreground">last 30 days</p>
               </CardContent>
             </Card>
 
@@ -172,10 +172,10 @@ export default function AIAdvisor() {
               </CardHeader>
               <CardContent>
                 <div className={`text-2xl font-bold ${summary.net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  Rp {summary.net_balance?.toLocaleString('id-ID') || 0}
+                  ${summary.net_balance?.toLocaleString('en-US') || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {summary.transaction_count || 0} transaksi
+                  {summary.transaction_count || 0} transactions
                 </p>
               </CardContent>
             </Card>
@@ -185,7 +185,7 @@ export default function AIAdvisor() {
           {summary.expense_by_category && Object.keys(summary.expense_by_category).length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Pengeluaran per Kategori</CardTitle>
+                <CardTitle>Expense by Category</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -198,7 +198,7 @@ export default function AIAdvisor() {
                           <div className="flex items-center justify-between text-sm">
                             <span className="font-medium">{category}</span>
                             <span className="text-muted-foreground">
-                              Rp {amount.toLocaleString('id-ID')} ({percentage}%)
+                              ${amount.toLocaleString('en-US')} ({percentage}%)
                             </span>
                           </div>
                           <Progress value={parseFloat(percentage)} className="h-2" />
@@ -216,7 +216,7 @@ export default function AIAdvisor() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  Analisa & Rekomendasi AI
+                  AI Analysis & Recommendations
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -241,7 +241,7 @@ export default function AIAdvisor() {
               disabled={!credits || credits.remainingCredits <= 0}
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Analisa Baru
+              New Analysis
             </Button>
           </div>
         </>

@@ -38,15 +38,15 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
-        title: 'Berhasil!',
-        description: 'Transaksi berhasil dihapus',
+        title: 'Success!',
+        description: 'Transaction deleted successfully',
       });
     },
     onError: (error) => {
       console.error('Error deleting transaction:', error);
       toast({
-        title: 'Gagal',
-        description: 'Gagal menghapus transaksi. Silakan coba lagi.',
+        title: 'Failed',
+        description: 'Failed to delete transaction. Please try again.',
         variant: 'destructive',
       });
     },
@@ -73,8 +73,8 @@ export default function Dashboard() {
         if (isEventType(response.events, 'create')) {
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
           toast({
-            title: 'Transaksi Baru',
-            description: 'Dashboard telah diperbarui dengan transaksi terbaru',
+            title: 'New Transaction',
+            description: 'Dashboard has been updated with the latest transaction',
           });
         } else if (isEventType(response.events, 'update')) {
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -181,7 +181,7 @@ export default function Dashboard() {
             Dashboard Overview
           </h1>
           <p className="text-muted-foreground mt-1">
-            Ringkasan keuangan bisnis Anda
+            A summary of your business's finances
           </p>
         </div>
         <AddTransactionDialog />
@@ -191,7 +191,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center space-y-2">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-muted-foreground">Memuat dashboard...</p>
+            <p className="text-sm text-muted-foreground">Loading dashboard...</p>
           </div>
         </div>
       ) : (
@@ -199,21 +199,21 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard
               icon={TrendingUp}
-              label="Pendapatan"
+              label="Income"
               value={formatCurrency(stats.income)}
               trend={stats.incomeTrend}
               valueColor="text-[#65a30d]"
             />
             <StatsCard
               icon={TrendingDown}
-              label="Pengeluaran"
+              label="Expense"
               value={formatCurrency(stats.expense)}
               trend={stats.expenseTrend}
               valueColor="text-destructive"
             />
             <StatsCard
               icon={Wallet}
-              label="Saldo"
+              label="Balance"
               value={formatCurrency(stats.balance)}
               trend={stats.balanceTrend}
               valueColor="text-[#65a30d]"
@@ -239,13 +239,13 @@ export default function Dashboard() {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Transaksi Terbaru</h2>
+              <h2 className="text-xl font-bold">Recent Transactions</h2>
               <Button
                 variant="outline"
                 onClick={() => setLocation('/transactions')}
                 data-testid="button-view-all"
               >
-                Lihat Semua
+                View All
               </Button>
             </div>
             <div className="space-y-2">
@@ -260,7 +260,7 @@ export default function Dashboard() {
                 ))
               ) : (
                 <p className="text-center text-muted-foreground py-8">
-                  Belum ada transaksi. Tambahkan transaksi pertama Anda!
+                  No transactions yet. Add your first one!
                 </p>
               )}
             </div>

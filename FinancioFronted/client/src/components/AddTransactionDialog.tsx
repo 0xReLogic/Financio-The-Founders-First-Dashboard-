@@ -64,7 +64,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           receiptId = uploadResult.$id;
         } catch (error) {
           console.error('Error uploading receipt:', error);
-          throw new Error('Gagal upload bukti transaksi');
+          throw new Error('Failed to upload receipt');
         }
       }
 
@@ -73,8 +73,8 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast({
-        title: 'Berhasil!',
-        description: 'Transaksi berhasil ditambahkan',
+        title: 'Success!',
+        description: 'Transaction added successfully',
       });
       setOpen(false);
       // Reset form
@@ -88,7 +88,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
       console.error('Error creating transaction:', error);
       toast({
         title: 'Gagal',
-        description: error instanceof Error ? error.message : 'Gagal menambahkan transaksi. Silakan coba lagi.',
+        description: error instanceof Error ? error.message : 'Failed to add transaction. Please try again.',
         variant: 'destructive',
       });
     },
@@ -102,7 +102,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
     if (!selectedCategory) {
       toast({
         title: 'Error',
-        description: 'Kategori tidak valid',
+        description: 'Invalid category',
         variant: 'destructive',
       });
       return;
@@ -113,7 +113,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       toast({
         title: 'Error',
-        description: 'Jumlah tidak valid',
+        description: 'Invalid amount',
         variant: 'destructive',
       });
       return;
@@ -136,17 +136,17 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
         {trigger || (
           <Button data-testid="button-add-transaction">
             <Plus className="w-4 h-4 mr-2" />
-            Tambah Transaksi
+            Add Transaction
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" data-testid="dialog-add-transaction">
         <DialogHeader>
-          <DialogTitle>Tambah Transaksi Baru</DialogTitle>
+          <DialogTitle>Add New Transaction</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Tipe</Label>
+            <Label>Type</Label>
             <RadioGroup value={type} onValueChange={(v) => {
               setType(v as 'income' | 'expense');
               setCategory(''); // Reset category when type changes
@@ -155,13 +155,13 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="income" id="income" data-testid="radio-income" />
                   <Label htmlFor="income" className="cursor-pointer">
-                    Pemasukan
+                    Income
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="expense" id="expense" data-testid="radio-expense" />
                   <Label htmlFor="expense" className="cursor-pointer">
-                    Pengeluaran
+                    Expense
                   </Label>
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Jumlah</Label>
+            <Label htmlFor="amount">Amount</Label>
             <Input
               id="amount"
               type="text"
@@ -182,10 +182,10 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Kategori</Label>
+            <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={setCategory} required disabled={categoriesLoading}>
               <SelectTrigger id="category" data-testid="select-category">
-                <SelectValue placeholder={categoriesLoading ? "Memuat..." : "Pilih kategori"} />
+                <SelectValue placeholder={categoriesLoading ? "Loading..." : "Select a category"} />
               </SelectTrigger>
               <SelectContent>
                 {filteredCategories.length > 0 ? (
@@ -196,9 +196,9 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
                   ))
                 ) : (
                   <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                    Belum ada kategori {type === 'income' ? 'pemasukan' : 'pengeluaran'}.
+                    No {type === 'income' ? 'income' : 'expense'} categories yet.
                     <br />
-                    Buat kategori di halaman Kategori terlebih dahulu.
+                    Create a category on the Categories page first.
                   </div>
                 )}
               </SelectContent>
@@ -206,10 +206,10 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Supplier invoice untuk..."
+              placeholder="Supplier invoice for..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               data-testid="input-description"
@@ -218,7 +218,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date">Tanggal</Label>
+            <Label htmlFor="date">Date</Label>
             <Input
               id="date"
               type="date"
@@ -230,7 +230,7 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label>Bukti Transaksi (Opsional)</Label>
+            <Label>Receipt (Optional)</Label>
             <FileUploadPreview
               onFileSelect={setReceiptFile}
               accept="image/*,.pdf"
@@ -246,14 +246,14 @@ export default function AddTransactionDialog({ trigger }: AddTransactionDialogPr
               data-testid="button-cancel"
               disabled={createMutation.isPending}
             >
-              Batal
+              Cancel
             </Button>
             <Button 
               type="submit" 
               data-testid="button-save"
               disabled={createMutation.isPending || categoriesLoading || !category}
             >
-              {createMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+              {createMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </form>

@@ -16,31 +16,31 @@ export default function Landing() {
   const features = [
     {
       icon: TrendingUp,
-      title: 'Dashboard Visual',
-      description: 'Lihat kesehatan finansial bisnis Anda dalam sekali pandang dengan charts interaktif',
+      title: 'Visual Dashboard',
+      description: 'See your business\'s financial health at a glance with interactive charts',
     },
     {
       icon: Sparkles,
       title: 'AI Financial Advisor',
-      description: 'Dapatkan rekomendasi cerdas dari AI untuk optimasi keuangan bisnis Anda',
+      description: 'Get smart recommendations from AI to optimize your business finances',
     },
     {
       icon: Shield,
-      title: 'Aman & Terpercaya',
-      description: 'Data keuangan Anda tersimpan aman dengan enkripsi enterprise-grade',
+      title: 'Secure & Reliable',
+      description: 'Your financial data is stored securely with enterprise-grade encryption',
     },
     {
       icon: Zap,
-      title: 'Super Cepat',
-      description: 'Input transaksi dalam hitungan detik, tidak perlu Excel yang ribet',
+      title: 'Super Fast',
+      description: 'Input transactions in seconds, no more complicated Excel',
     },
   ];
 
   const benefits = [
-    'Hemat waktu hingga 5 jam per minggu',
-    'Insight keuangan real-time',
-    'Tidak perlu keahlian akuntansi',
-    'Cocok untuk UMKM & founder',
+    'Save up to 5 hours per week',
+    'Real-time financial insights',
+    'No accounting expertise required',
+    'Perfect for SMEs & founders',
   ];
 
   return (
@@ -57,12 +57,12 @@ export default function Landing() {
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" data-testid="button-login">
-                Masuk
+                Login
               </Button>
             </Link>
             <Link href="/register">
               <Button data-testid="button-register">
-                Daftar Gratis
+                Sign Up Free
               </Button>
             </Link>
           </div>
@@ -77,38 +77,38 @@ export default function Landing() {
             <div className="space-y-6">
               <div className="inline-block">
                 <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20">
-                  Trusted by 1000+ UMKM Indonesia
+                  Trusted by 1000+ Indonesian SMEs
                 </span>
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
-                Kelola Keuangan Bisnis{' '}
-                <span className="text-primary">Lebih Mudah</span>
+                Manage Your Business Finances{' '}
+                <span className="text-primary">More Easily</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
-                Beralih dari kekacauan Excel ke dashboard keuangan yang bersih, visual, dan cerdas. 
-                Dilengkapi AI Advisor untuk insight bisnis instan.
+                Switch from the chaos of Excel to a clean, visual, and intelligent financial dashboard. 
+                Equipped with an AI Advisor for instant business insights.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="/register">
                   <Button size="lg" className="w-full sm:w-auto" data-testid="button-cta-register">
-                    Mulai Gratis Sekarang
+                    Start for Free Now
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/dashboard">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-cta-demo">
-                    Lihat Demo
+                    View Demo
                   </Button>
                 </Link>
               </div>
               <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Gratis 30 hari</span>
+                  <span>30-day free trial</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Tanpa kartu kredit</span>
+                  <span>No credit card required</span>
                 </div>
               </div>
             </div>
@@ -130,10 +130,10 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">
-              Fitur yang Bikin Hidup Lebih Mudah
+              Features That Make Life Easier
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Semua yang Anda butuhkan untuk mengelola keuangan bisnis dalam satu dashboard
+              Everything you need to manage your business finances in one dashboard
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -157,7 +157,7 @@ export default function Landing() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">
-              Kenapa Founder & UMKM Pilih Financio?
+              Why do Founders & SMEs Choose Financio?
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -179,14 +179,14 @@ export default function Landing() {
       <section className="py-20 lg:py-32">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-bold mb-6">
-            Siap untuk Keuangan Bisnis yang Lebih Sehat?
+          Ready for Healthier Business Finances?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join ribuan founder dan UMKM yang sudah beralih dari Excel ke Financio
+            Join thousands of founders and SMEs who have switched from Excel to Financio
           </p>
           <Link href="/register">
             <Button size="lg" data-testid="button-final-cta">
-              Mulai Gratis Sekarang
+              Start for Free Now
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
@@ -204,7 +204,7 @@ export default function Landing() {
               <span className="text-xl font-bold">Financio</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2025 Financio. Dashboard keuangan untuk bootstrapped founders.
+              © 2025 Financio. Financial dashboard for bootstrapped founders.
             </p>
           </div>
         </div>

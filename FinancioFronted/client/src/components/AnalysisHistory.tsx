@@ -20,11 +20,11 @@ export default function AnalysisHistory() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
-            Riwayat Analisa
+            Analysis History
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Memuat riwayat...</p>
+          <p className="text-sm text-muted-foreground">Loading history...</p>
         </CardContent>
       </Card>
     );
@@ -41,7 +41,7 @@ export default function AnalysisHistory() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Belum ada riwayat analisa. Mulai analisa pertama Anda!
+            No analysis history yet. Start your first analysis!
           </p>
         </CardContent>
       </Card>
@@ -67,7 +67,7 @@ export default function AnalysisHistory() {
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">
-                    {new Date(analysis.analysisDate).toLocaleDateString('id-ID', {
+                    {new Date(analysis.analysisDate).toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
@@ -76,27 +76,27 @@ export default function AnalysisHistory() {
                     })}
                   </p>
                   <span className="text-xs text-muted-foreground">
-                    {analysis.periodDays} hari
+                    {analysis.periodDays} days
                   </span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-sm">
                   <div>
-                    <p className="text-muted-foreground text-xs">Pendapatan</p>
+                    <p className="text-muted-foreground text-xs">Income</p>
                     <p className="font-medium text-green-600">
-                      Rp {summary.total_income?.toLocaleString('id-ID') || 0}
+                      $ {summary.total_income?.toLocaleString('en-US') || 0}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs">Pengeluaran</p>
+                    <p className="text-muted-foreground text-xs">Expense</p>
                     <p className="font-medium text-red-600">
-                      Rp {summary.total_expense?.toLocaleString('id-ID') || 0}
+                      $ {summary.total_expense?.toLocaleString('en-US') || 0}
                     </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs">Net Balance</p>
                     <p className={`font-medium ${summary.net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      Rp {summary.net_balance?.toLocaleString('id-ID') || 0}
+                      $ {summary.net_balance?.toLocaleString('en-US') || 0}
                     </p>
                   </div>
                 </div>
@@ -104,7 +104,7 @@ export default function AnalysisHistory() {
                 {analysis.advice && (
                   <details className="text-sm">
                     <summary className="cursor-pointer text-primary font-medium">
-                      Lihat Rekomendasi AI
+                      View AI Recommendations
                     </summary>
                     <div className="mt-2 prose prose-sm max-w-none dark:prose-invert">
                       <ReactMarkdown>{analysis.advice}</ReactMarkdown>

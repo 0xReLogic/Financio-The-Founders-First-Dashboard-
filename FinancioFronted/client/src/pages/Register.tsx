@@ -74,10 +74,10 @@ export default function Register() {
           </div>
           <div>
             <h1 className="text-3xl font-bold" data-testid="text-page-title">
-              Daftar Financio
+              Create your Financio Account
             </h1>
             <p className="text-muted-foreground mt-2">
-              Mulai kelola keuangan bisnis dengan lebih baik
+              Start managing your business finances better
             </p>
           </div>
         </CardHeader>
@@ -102,11 +102,11 @@ export default function Register() {
           ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Lengkap</Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Pak Andi"
+                placeholder="e.g. John Doe"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 data-testid="input-name"
@@ -115,11 +115,11 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="businessName">Nama Bisnis</Label>
+              <Label htmlFor="businessName">Business Name</Label>
               <Input
                 id="businessName"
                 type="text"
-                placeholder="Warung Kopi Pak Andi"
+                placeholder="e.g. John's Coffee Shop"
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 data-testid="input-business-name"
@@ -132,7 +132,7 @@ export default function Register() {
               <Input
                 id="email"
                 type="email"
-                placeholder="andi@warungkopi.com"
+                placeholder="e.g. john.doe@company.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 data-testid="input-email"
@@ -146,7 +146,7 @@ export default function Register() {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Minimal 8 karakter"
+                  placeholder="At least 8 characters"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   data-testid="input-password"
@@ -169,12 +169,12 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Ketik ulang password"
+                  placeholder="Re-type your password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   data-testid="input-confirm-password"
@@ -202,7 +202,7 @@ export default function Register() {
                   Creating account...
                 </>
               ) : (
-                'Daftar Sekarang'
+                'Create Account'
               )}
             </Button>
           </form>
@@ -210,10 +210,10 @@ export default function Register() {
 
           {!registrationSuccess && (
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Sudah punya akun?{' '}
+            Already have an account?{' '}
             <Link href="/login">
               <a className="text-primary hover:underline font-semibold" data-testid="link-login">
-                Masuk di sini
+                Login
               </a>
             </Link>
           </p>
