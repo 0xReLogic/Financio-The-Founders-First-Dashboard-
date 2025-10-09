@@ -148,7 +148,7 @@ def generate_ai_advice(analysis_data, transactions):
         
         # Build prompt
         prompt = f"""
-You are a financial advisor for Small and Medium Enterprises (SMEs). 
+You are a financial advisor for Small and Medium Enterprises (SMEs) and startups globally. 
 Analyze the following financial data and provide actionable advice in English.
 
 **Financial Summary (Last 30 Days):**
@@ -168,10 +168,11 @@ Analyze the following financial data and provide actionable advice in English.
 **Please provide:**
 1. **Financial Analysis**: Provide a brief analysis of the business's financial health.
 2. **Areas for Savings**: Identify expense categories that can be optimized.
-3. **Recommendations**: Give 3-5 specific recommendations to improve cash flow.
-4. **Warnings**: Highlight any critical issues (e.g., expenses exceeding income).
+3. **Recommendations**: Give 3-5 specific, actionable recommendations to improve cash flow and profitability.
+4. **Warnings**: Highlight any critical issues (e.g., expenses exceeding income, concerning spending patterns).
 
-Format response dalam markdown dengan struktur yang jelas dan mudah dibaca.
+Format your response in clear markdown with proper headings and structure for easy readability.
+Focus on practical, global business advice applicable to SMEs and startups worldwide.
 """
         
         # Generate advice

@@ -1,5 +1,5 @@
 export const formatCurrency = (amount: number): string => {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
+  return `$${amount.toLocaleString('en-US')}`;
 };
 
 export const formatDate = (date: Date): string => {
@@ -11,16 +11,16 @@ export const formatDate = (date: Date): string => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     if (diffHours === 0) {
       const diffMins = Math.floor(diffMs / (1000 * 60));
-      return `${diffMins} menit yang lalu`;
+      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
     }
-    return `${diffHours} jam yang lalu`;
+    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
   } else if (diffDays === 1) {
-    return 'Kemarin';
+    return 'Yesterday';
   } else if (diffDays < 7) {
-    return `${diffDays} hari yang lalu`;
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
   }
 
-  return date.toLocaleDateString('id-ID', {
+  return date.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
