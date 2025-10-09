@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Leaf, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/authService';
+import logo from '@assets/stock_images/Financio logo.png';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -69,9 +70,11 @@ export default function Register() {
         <CardHeader className="text-center space-y-4 pb-8">
           <div className="flex justify-center">
             <Link href="/">
-              <div className="w-16 h-16 rounded-md bg-primary flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity">
-                <Leaf className="w-10 h-10 text-primary-foreground" />
-              </div>
+              <img 
+                src={logo} 
+                alt="Financio" 
+                className="w-16 h-16 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+              />
             </Link>
           </div>
           <div>

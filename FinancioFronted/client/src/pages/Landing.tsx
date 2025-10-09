@@ -2,7 +2,6 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Leaf, 
   TrendingUp, 
   Sparkles, 
   Shield, 
@@ -11,6 +10,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import heroImage from '@assets/stock_images/business_success_fin_1ae5d2d6.jpg';
+import logo from '@assets/stock_images/Financio logo.png';
 
 export default function Landing() {
   const features = [
@@ -49,9 +49,7 @@ export default function Landing() {
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="Financio" className="w-10 h-10 object-contain" />
             <span className="text-2xl font-bold">Financio</span>
           </div>
           <div className="flex items-center gap-3">
@@ -198,9 +196,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="Financio" className="w-8 h-8 object-contain" />
               <span className="text-xl font-bold">Financio</span>
             </div>
             <p className="text-sm text-muted-foreground">

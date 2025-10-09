@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, FolderOpen, Sparkles, Settings, Leaf, LogOut } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, Sparkles, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useAuthStore } from '@/lib/authStore';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from '@/components/ui/sidebar';
+import logo from '@assets/stock_images/Financio logo.png';
 
 const menuItems = [
   {
@@ -65,9 +66,7 @@ export function AppSidebar() {
     <Sidebar data-testid="sidebar-main">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-            <Leaf className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="Financio" className="w-8 h-8 object-contain" />
           <span className="text-xl font-bold text-foreground">Financio</span>
         </div>
       </SidebarHeader>
