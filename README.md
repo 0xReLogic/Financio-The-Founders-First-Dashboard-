@@ -277,13 +277,13 @@ Select your existing Appwrite project or create a new one.
 5. Deploy backend resources
 ```bash
 # Deploy database collections
-appwrite deploy collection
+appwrite push collection
 
 # Deploy storage buckets
-appwrite deploy bucket
+appwrite push bucket
 
 # Deploy serverless functions
-appwrite deploy function
+appwrite push function
 ```
 
 6. Install frontend dependencies
@@ -308,7 +308,7 @@ Access the application at `http://localhost:5173`
 Deploy frontend to Appwrite Cloud:
 ```bash
 cd FinancioFronted
-appwrite deploy
+appwrite push
 ```
 
 Your application will be available at `https://[project-id].appwrite.network`
