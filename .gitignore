@@ -1,7 +1,9 @@
 # Ignore everything in root except FinancioFronted folder
 /*
 !/.gitignore
+!/README.md
 !/FinancioFronted/
+!/functions/
 .serena/
 .vscode/
 !/functions/
