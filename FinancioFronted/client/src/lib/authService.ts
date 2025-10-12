@@ -12,9 +12,8 @@ class AuthService {
     try {
       const user = await account.create(ID.unique(), email, password, name);
       console.log('✅ User registered:', user);
-      
-      // Auto-lo
-      // gin after successful registration
+
+      // Auto-login after successful registration
       await account.createEmailPasswordSession(email, password);
       console.log('✅ Auto-login successful');
       

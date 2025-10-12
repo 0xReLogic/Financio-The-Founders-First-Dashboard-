@@ -97,12 +97,16 @@ def get_user_transactions(databases, user_id, days=30):
     except Exception as e:
         raise Exception(f"Failed to fetch transactions: {str(e)}")
 
-def get_categories(databases):
-    """Fetch all categories"""
+def get_categories(databases, user_id):
+    """Fetch user's categories"""
     try:
         categories = databases.list_documents(
             database_id=DATABASE_ID,
-            collection_id=CATEGORIES_COLLECTION
+            collection_id=CATEGORIES_COLLECTION,
+            queries=[
+                Query.equal("userId", user_id),
+                Query.limit(100)
+            ]
         )
         
         # Create category lookup map
@@ -253,7 +257,7 @@ def main(context):
         
         # Fetch categories
         context.log("Fetching categories...")
-        categories = get_categories(databases)
+        categories = get_categories(databases, user_id)
         
         # Analyze transactions
         context.log("Analyzing transaction patterns...")
