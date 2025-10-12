@@ -189,8 +189,10 @@ Focus on practical, global business advice applicable to SMEs and startups world
 def save_analysis(databases, user_id, analysis_summary, ai_advice):
     """Save analysis result to database"""
     try:
-        # Collection has create("any") permission, documentSecurity: true
-        # So we DON'T set document-level permissions - let collection handle it
+        # Ensure advice is string and <= 5000 chars
+        advice_str = str(ai_advice) if ai_advice is not None else ""
+        if len(advice_str) > 5000:
+            advice_str = advice_str[:5000]
         analysis = databases.create_document(
             database_id=DATABASE_ID,
             collection_id=AI_ANALYSES_COLLECTION,
@@ -199,12 +201,11 @@ def save_analysis(databases, user_id, analysis_summary, ai_advice):
                 "userId": user_id,
                 "analysisDate": datetime.now().isoformat(),
                 "summary": json.dumps(analysis_summary),
-                "advice": ai_advice,
+                "advice": advice_str,
                 "periodDays": 30
             }
             # No permissions parameter - rely on collection-level permissions
         )
-        
         return analysis
     except Exception as e:
         raise Exception(f"Failed to save analysis: {str(e)}")

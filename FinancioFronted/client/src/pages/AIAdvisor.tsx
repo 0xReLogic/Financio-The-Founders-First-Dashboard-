@@ -9,6 +9,7 @@ import ProgressiveLoading from '@/components/ProgressiveLoading';
 import { useToast } from '@/hooks/use-toast';
 import { aiFunctionService } from '@/lib/databaseService';
 import { useAuthStore } from '@/lib/authStore';
+import { exportAnalysisToPDF } from '@/lib/pdfExport';
 import ReactMarkdown from 'react-markdown';
 
 export default function AIAdvisor() {
@@ -64,18 +65,36 @@ export default function AIAdvisor() {
     analysisMutation.mutate();
   };
 
-  const handleExportPDF = () => {
-    toast({
-      title: 'Exporting PDF',
-      description: 'The analysis report is being downloaded...',
-    });
-    // TODO: Implement PDF export
-    setTimeout(() => {
+  const handleExportPDF = async () => {
+    if (!analysisResult || !summary || !advice) {
+      toast({
+        title: 'No Data',
+        description: 'No analysis data available to export',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: 'Generating PDF',
+        description: 'Your financial analysis report is being generated...',
+      });
+
+      await exportAnalysisToPDF(summary, advice, user?.name);
+
       toast({
         title: 'PDF Downloaded Successfully',
-        description: 'financial-analysis-report.pdf',
+        description: 'Your financial analysis report has been downloaded',
       });
-    }, 1500);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast({
+        title: 'Export Failed',
+        description: 'Failed to generate PDF report',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Parse analysis data - analysisResult from function is already an object
